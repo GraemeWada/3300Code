@@ -45,6 +45,12 @@ lemlib::ControllerSettings angular_controller(2, // proportional gain (kP)
                                               500, // large error range timeout, in milliseconds
                                               0 // maximum acceleration (slew)
 );
+
+lemlib::Chassis chassis(dt, // drivetrain settings
+                        lateral_controller, // lateral PID settings
+                        angular_controller, // angular PID settings
+                        sensors // odometry sensors
+);
 /**
  * A callback function for LLEMU's center button.
  *
@@ -128,7 +134,7 @@ void autonomous() {}
 
 
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
+	pros::Controller controller(pros::E_CONTROLLER_MASTER);
 	  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
 
 
@@ -137,11 +143,25 @@ void opcontrol() {
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
 
-		// Arcade control scheme
-		int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
-		int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
-		left_mg.move(dir - turn);                      // Sets left motor voltage
-		right_mg.move(dir + turn);                     // Sets right motor voltage
-		pros::delay(20);                               // Run for 20 ms then update
+		// // Arcade control scheme
+		// int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
+		// int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
+		// left_mg.move(dir - turn);                      // Sets left motor voltage
+		// right_mg.move(dir + turn);                     // Sets right motor voltage
+		// pros::delay(20);  
+
+		// get left y and right x positions
+        int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+        int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+
+        // move the robot
+        chassis.arcade(leftY, rightX);
+
+        // delay to save resources
+        pros::delay(25);                         // Run for 20 ms then update
 	}
+	// loop forever
+    while (true) {
+        
+    }
 }
