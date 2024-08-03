@@ -5,7 +5,7 @@
 pros::MotorGroup left_mg({1, 2, 3}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
 	pros::MotorGroup right_mg({-4, -5, -6}, pros::MotorGearset::blue);
 
-lemlib::Drivetrain dt(&left_mg, &right_mg, 10, lemlib::Omniwheel::NEW_325, 360, 2);
+lemlib::Drivetrain dt(&left_mg, &right_mg, 10, lemlib::Omniwheel::NEW_325, 480, 2);
 
 //odom
 pros::Imu imu(10);
@@ -46,10 +46,25 @@ lemlib::ControllerSettings angular_controller(2, // proportional gain (kP)
                                               0 // maximum acceleration (slew)
 );
 
+// input curve for throttle input during driver control
+lemlib::ExpoDriveCurve throttle_curve(3, // joystick deadband out of 127
+                                     10, // minimum output where drivetrain will move out of 127
+                                     1.019 // expo curve gain
+);
+
+// input curve for steer input during driver control
+lemlib::ExpoDriveCurve steer_curve(3, // joystick deadband out of 127
+                                  10, // minimum output where drivetrain will move out of 127
+                                  1.019 // expo curve gain
+);
+
+
 lemlib::Chassis chassis(dt, // drivetrain settings
                         lateral_controller, // lateral PID settings
                         angular_controller, // angular PID settings
-                        sensors // odometry sensors
+                        sensors,
+						&throttle_curve,
+						&steer_curve // odometry sensors
 );
 /**
  * A callback function for LLEMU's center button.
@@ -114,7 +129,9 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	chassis.setPose(0,0,0);
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -137,7 +154,7 @@ void opcontrol() {
 	pros::Controller controller(pros::E_CONTROLLER_MASTER);
 	  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
 
-
+    //CONTROL LOOP
 	while (true) {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
@@ -160,8 +177,4 @@ void opcontrol() {
         // delay to save resources
         pros::delay(25);                         // Run for 20 ms then update
 	}
-	// loop forever
-    while (true) {
-        
-    }
 }
