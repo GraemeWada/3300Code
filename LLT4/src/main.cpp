@@ -1,27 +1,34 @@
 #include "main.h"
 #include "lemlib/api.hpp" // IWYU pragma: keep
 
+pros::Controller controller(pros::E_CONTROLLER_MASTER);
+pros::MotorGroup left_mg({-1, 3}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
+	pros::MotorGroup right_mg({9, -17}, pros::MotorGearset::blue);
 
-pros::MotorGroup left_mg({1, 2, 3}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-	pros::MotorGroup right_mg({-4, -5, -6}, pros::MotorGearset::blue);
+lemlib::Drivetrain drivetrain(&left_mg, &right_mg, 11.5, lemlib::Omniwheel::NEW_325, 480, 2);
 
-lemlib::Drivetrain dt(&left_mg, &right_mg, 10, lemlib::Omniwheel::NEW_325, 480, 2);
 
 //odom
-pros::Imu imu(10);
-pros::Rotation rv(7); //vert
-pros::Rotation rh(8); //horiz set to negative if reverse
+// pros::Imu imu(10);
+// pros::Rotation rv(7); //vert
+// pros::Rotation rh(8); //horiz set to negative if reverse
 
-lemlib::TrackingWheel htw(&rh, 3.25, -5.25); // third value is tracking center offset
-lemlib::TrackingWheel vtw(&rv, 3.25, 5.25);
+// lemlib::TrackingWheel htw(&rh, 3.25, -5.25); // third value is tracking center offset
+// lemlib::TrackingWheel vtw(&rv, 3.25, 5.25);
 
-lemlib::OdomSensors sensors(&vtw, // vertical tracking wheel 1, set to null
+// lemlib::OdomSensors sensors(&vtw, // vertical tracking wheel 1, set to null
+//                             nullptr, // vertical tracking wheel 2, set to nullptr as we are using IMEs
+//                             &htw, // horizontal tracking wheel 1
+//                             nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
+//                             &imu // inertial sensor
+// );
+
+lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1, set to null
                             nullptr, // vertical tracking wheel 2, set to nullptr as we are using IMEs
-                            &htw, // horizontal tracking wheel 1
+                            nullptr, // horizontal tracking wheel 1
                             nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
-                            &imu // inertial sensor
+                            nullptr // inertial sensor
 );
-
 // lateral PID controller
 lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
                                               0, // integral gain (kI)
@@ -59,7 +66,7 @@ lemlib::ExpoDriveCurve steer_curve(3, // joystick deadband out of 127
 );
 
 
-lemlib::Chassis chassis(dt, // drivetrain settings
+lemlib::Chassis chassis(drivetrain, // drivetrain settings
                         lateral_controller, // lateral PID settings
                         angular_controller, // angular PID settings
                         sensors,
@@ -93,11 +100,11 @@ void initialize() {
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
-	while (true){
-        pros::lcd::print(1, "Rotation Sensor H: %i", rh.get_position());
-		pros::lcd::print(0, "Rotation Sensor V: %i", rh.get_position());
-        pros::delay(10); // delay to save resources. DO NOT REMOVE
-	}
+	// while (true){
+    //     //pros::lcd::print(1, "Rotation Sensor H: %i", rh.get_position());
+	// 	//pros::lcd::print(0, "Rotation Sensor V: %i", rh.get_position());
+    //     pros::delay(10); // delay to save resources. DO NOT REMOVE
+	// }
 }
 
 /**
@@ -150,31 +157,16 @@ void autonomous() {
 
 
 
-void opcontrol() {
-	pros::Controller controller(pros::E_CONTROLLER_MASTER);
-	  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
-
-    //CONTROL LOOP
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
-
-		// // Arcade control scheme
-		// int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
-		// int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
-		// left_mg.move(dir - turn);                      // Sets left motor voltage
-		// right_mg.move(dir + turn);                     // Sets right motor voltage
-		// pros::delay(20);  
-
-		// get left y and right x positions
-        int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-        int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-
-        // move the robot
-        chassis.arcade(leftY, rightX);
-
-        // delay to save resources
-        pros::delay(25);                         // Run for 20 ms then update
-	}
-}
+    void opcontrol() {
+        // controller
+        // loop to continuously update motors
+        while (true) {
+            // get joystick positions
+            int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+            int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+            // move the chassis with curvature drive
+            chassis.arcade(leftY, rightX);
+            // delay to save resources
+            pros::delay(10);
+        }
+    }
