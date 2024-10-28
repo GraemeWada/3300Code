@@ -2,9 +2,12 @@
 #include "lemlib/api.hpp" // IWYU pragma: keep
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
-pros::MotorGroup left_mg({-13, -12, 11}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-	pros::MotorGroup right_mg({16, 15, -14}, pros::MotorGearset::blue);
-    pros::Motor intake(17, pros::MotorGearset::blue);
+pros::MotorGroup left_mg({-20, -19, -9}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
+	pros::MotorGroup right_mg({1, 2, 3}, pros::MotorGearset::blue);
+    pros::Motor intake(10, pros::MotorGearset::blue);
+    pros::Motor ws(18, pros::MotorGearset::red);
+
+pros::Rotation wsr(11);
 
 pros::ADIDigitalOut clampPistons ('H');
 //trackwidth 29cm = ~11.417in
@@ -77,6 +80,7 @@ lemlib::Chassis chassis(drivetrain, // drivetrain settings
 						&throttle_curve,
 						&steer_curve // odometry sensors
 );
+
 /**
  * A callback function for LLEMU's center button.
  *
@@ -159,7 +163,7 @@ void autonomous() {
 	chassis.setPose(0,0,0);
     // turn to face heading 90 with a very long timeout
     //chassis.turnToHeading(90, 100000);
-    chassis.follow(path1_txt, 4000, 15);
+    // chassis.follow(path1_txt, 4000, 15);
 
 }
 
@@ -184,6 +188,11 @@ void autonomous() {
 
         bool clamp = false;
         intake.set_voltage_limit(12000);
+        int i = -1;
+
+        ws.tare_position();
+        wsr.reset_position();
+        
         // controller
         // loop to continuously update motors
         while (true) {
@@ -204,6 +213,30 @@ void autonomous() {
             } else {
                 intake.brake();
             }
+            if(controller.get_digital(DIGITAL_L2)){
+                ws.move_voltage(12000);
+            } else if (controller.get_digital(DIGITAL_L1)){
+                ws.move_voltage(-12000);
+            } else {
+                ws.brake();
+            }
+
+            // if(controller.get_digital_new_press(DIGITAL_UP)){
+            //     i++;
+            //     if(i > 2){
+            //         i = 0;
+            //     }
+            //     pros::lcd::set_text(2, std::to_string(i));
+            //     if(i == 0){
+            //         ws.move_absolute(0,70);
+                    
+            //     }
+            //     else if (i == 1){
+            //         ws.move_absolute(1000, 70);
+            //     } else if (i ==2){
+            //         ws.move_absolute(0, 70);
+            //     }
+            // }
             // get joystick positions
             int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
             int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
