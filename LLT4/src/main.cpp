@@ -2,12 +2,12 @@
 #include "lemlib/api.hpp" // IWYU pragma: keep
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
-pros::MotorGroup left_mg({-20, -19, -9}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-	pros::MotorGroup right_mg({1, 2, 3}, pros::MotorGearset::blue);
+pros::MotorGroup left_mg({-2, -1, -4}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
+	pros::MotorGroup right_mg({3, 14, 15}, pros::MotorGearset::blue);
     pros::Motor intake(10, pros::MotorGearset::blue);
-    pros::Motor ws(18, pros::MotorGearset::red);
+    pros::Motor ws(11, pros::MotorGearset::red);
 
-pros::Rotation wsr(11);
+// pros::Rotation wsr(11);
 
 pros::ADIDigitalOut clampPistons ('H');
 //trackwidth 29cm = ~11.417in
@@ -163,7 +163,7 @@ void autonomous() {
 	chassis.setPose(0,0,0);
     // turn to face heading 90 with a very long timeout
     //chassis.turnToHeading(90, 100000);
-    // chassis.follow(path1_txt, 4000, 15);
+    // chassis.follow(path1_txt, 10, 4000);
 
 }
 
@@ -191,7 +191,7 @@ void autonomous() {
         int i = -1;
 
         ws.tare_position();
-        wsr.reset_position();
+        //wsr.reset_position();
         
         // controller
         // loop to continuously update motors
