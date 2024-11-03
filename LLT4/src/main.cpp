@@ -55,9 +55,9 @@ lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1, set to null
 );
 
 // lateral PID controller
-lemlib::ControllerSettings lateral_controller(11, // proportional gain (kP)
+lemlib::ControllerSettings lateral_controller(4.4, // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              3, // derivative gain (kD)
+                                              3.75, // derivative gain (kD)
                                               0, // anti windup
                                               0, // small error range, in inches
                                               0, // small error range timeout, in milliseconds
@@ -67,9 +67,9 @@ lemlib::ControllerSettings lateral_controller(11, // proportional gain (kP)
 );
 
 // angular PID controller
-lemlib::ControllerSettings angular_controller(5, // proportional gain (kP)
-                                              0, // integral gain (kI)
-                                              12, // derivative gain (kD)
+lemlib::ControllerSettings angular_controller(3.4, // proportional gain (kP)
+                                              0.01, // integral gain (kI)
+                                              15.25, // derivative gain (kD)
                                               0, // anti windup
                                               0, // small error range, in degrees
                                               0, // small error range timeout, in milliseconds
@@ -79,15 +79,15 @@ lemlib::ControllerSettings angular_controller(5, // proportional gain (kP)
 );
 
 // input curve for throttle input during driver control
-lemlib::ExpoDriveCurve throttle_curve(3, // joystick deadband out of 127
-                                     10, // minimum output where drivetrain will move out of 127
-                                     1.019 // expo curve gain
+lemlib::ExpoDriveCurve throttle_curve(10, // joystick deadband out of 127
+                                     15, // minimum output where drivetrain will move out of 127
+                                     1.03 // expo curve gain
 );
 
 // input curve for steer input during driver control
-lemlib::ExpoDriveCurve steer_curve(3, // joystick deadband out of 127
-                                  10, // minimum output where drivetrain will move out of 127
-                                  1.019 // expo curve gain
+lemlib::ExpoDriveCurve steer_curve(10, // joystick deadband out of 127
+                                  15, // minimum output where drivetrain will move out of 127
+                                  1.03 // expo curve gain
 );
 
 
