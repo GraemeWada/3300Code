@@ -179,7 +179,7 @@ ASSET(path1_txt);
 void autonomous() {
 	chassis.setPose(0,0,0);
     // turn to face heading 90 with a very long timeout
-    //chassis.turnToHeading(90, 100000);
+    chassis.turnToHeading(90, 100000);
     // chassis.follow(path1_txt, 10, 4000);
 
 }
@@ -258,7 +258,47 @@ void LBController(LBPos pos){
 
 }
 
+float prevError = 0;
+float error = 0;
+float voltScalar = 1.5;
+float integral = 0;
 
+void liftPID(float desiredAngle, float kP, float kI, float kD, float settleError = 250, float integralMax = 36000){
+    //desired angle in centidegrees (0-36,000)
+    //settle error 250 cdeg
+    //idle = 0, primed = 26, scored = 140
+    float derivative = 0;
+    prevError = error;
+    float angle = (wsr.get_angle() >= 35000) ? wsr.get_angle() - 36000 : wsr.get_angle();
+    error = desiredAngle - angle;
+    pros::lcd::set_text(1, std::to_string(error));
+    pros::lcd::set_text(4, std::to_string(angle));
+    
+
+    integral += error;
+
+    if(integral >= 36000){
+        integral = 0;
+    }
+
+    derivative = error - prevError;
+
+    float power = (error * kP + integral * kI + derivative * kD) * voltScalar;
+    pros::lcd::set_text(3, std::to_string(power));
+
+    pros::lcd::set_text(5, std::to_string(fabs(error)));
+    if(fabs(error) <= settleError){
+        ws.brake();
+        return;
+    }
+    
+    if(power > 12000){
+        power = 12000;
+    } else if( power < -12000){
+        power = -12000;
+    }
+    ws.move_voltage(power);
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -273,14 +313,17 @@ void LBController(LBPos pos){
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+float liftP = 3;
+float liftI = 0;
+float liftD = 1;
+
 void opcontrol() {
+    ws.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
     bool clamp = false;
     intake.set_voltage_limit(12000);
-    int i = -1;
-
-    ws.tare_position();
-    //wsr.reset_position();
+    int i = 0;
+    wsr.reset_position();
     
     // controller
     // loop to continuously update motors
@@ -302,13 +345,32 @@ void opcontrol() {
         } else {
             intake.brake();
         }
-        if(controller.get_digital(DIGITAL_L2)){
-            ws.move_voltage(12000);
-        } else if (controller.get_digital(DIGITAL_L1)){
-            ws.move_voltage(-12000);
-        } else {
-            ws.brake();
+        // if(controller.get_digital(DIGITAL_L2)){
+        //     ws.move_voltage(12000);
+        // } else if (controller.get_digital(DIGITAL_L1)){
+        //     ws.move_voltage(-12000);
+        // } else {
+        //     ws.brake();
+        // }
+
+        if(controller.get_digital_new_press(DIGITAL_X)){
+            i++;
+            if( i > 2 ){
+                i = 0;
+            }
         }
+        
+        switch(i){
+                case 0:
+                liftPID(0, liftP, liftI, liftD, 250);
+                break;
+                case 1:
+                liftPID(2600, liftP, liftI, liftD, 250);
+                break;
+                case 2:
+                liftPID(14500, liftP, liftI, liftD, 250);
+            }
+            pros::lcd::set_text(2, std::to_string(i));
 
         // get joystick positions
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
