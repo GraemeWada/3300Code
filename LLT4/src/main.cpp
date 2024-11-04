@@ -12,7 +12,7 @@ pros::MotorGroup right_mg({3, 14, 15}, pros::MotorGearset::blue);
 pros::Motor intake(10, pros::MotorGearset::blue);
 pros::Motor ws(11, pros::MotorGearset::red);
 
-// pros::Rotation wsr(11);
+pros::Rotation wsr(19);
 
 pros::ADIDigitalOut clampPistons ('H');
 //trackwidth 29cm = ~11.417in
@@ -314,7 +314,7 @@ void opcontrol() {
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         // move the chassis with curvature drive
-        antiTipDrive(leftY, rightX, 1000, 900, 15, 20, 1.03);
+        antiTipDrive(rightX, leftY, 500, 900, 15, 20, 1.03);
         // delay to save resources
         pros::delay(10);
     }
