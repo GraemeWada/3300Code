@@ -122,22 +122,19 @@ void on_center_button() {
  */
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
-
-	pros::lcd::register_btn1_cb(on_center_button);
     chassis.calibrate();
-    // pros::Task screenTask([&]() {
-    //     while (true) {
-    //         // print robot location to the brain screen
-    //         pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-    //         pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-    //         pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-    //         // log position telemetry
-    //         lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
-    //         // delay to save resources
-    //         pros::delay(50);
-    //     }
-    // });
+    pros::Task screenTask([&]() {
+        while (true) {
+            // print robot location to the brain screen
+            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            // log position telemetry
+            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+            // delay to save resources
+            pros::delay(50);
+    }
+    });
 	// while (true){
     //     pros::lcd::print(1, "Rotation Sensor H: %i", rh.get_position());
 	// 	//pros::lcd::print(0, "Rotation Sensor V: %i", rh.get_position());
@@ -214,13 +211,14 @@ float driveCurve(float input, float deadband, float minOutput, float curve) {
  * @param curve drive curve setting
 
 **/
-void antiTipDrive(int left, int right, double changeRate, int maxChange, float deadband, float minOutput, float curve){
-    static double initTime = pros::millis();
+void antiTipDrive(int left, int right, double changeRate, int maxChange, float deadband, float minOutput, float Rcurve, float Lcurve){
     static int prevLeftPower = 0;
     static int prevRightPower = 0;
+    float leftC = driveCurve(left, deadband, minOutput,Lcurve);
+    float rightC= driveCurve(right, deadband, minOutput,Rcurve);
 
-    int leftPower = (driveCurve(left, deadband, minOutput,curve) + driveCurve(right, deadband, minOutput,curve)) * 12000 / 127;
-    int rightPower = (driveCurve(right, deadband, minOutput,curve) - driveCurve(left, deadband, minOutput,curve)) * 12000 / 127;
+    float leftPower = ( leftC + rightC) * 12000 / 127;
+    float rightPower = (right - left) * 12000 / 127;
 
 
     int leftChange  = leftPower - prevLeftPower;
@@ -254,16 +252,22 @@ void antiTipDrive(int left, int right, double changeRate, int maxChange, float d
 }
 
 
-void LBController(LBPos pos){
 
-}
 
-float prevError = 0;
-float error = 0;
-float voltScalar = 1.5;
-float integral = 0;
-
-void liftPID(float desiredAngle, float kP, float kI, float kD, float settleError = 250, float integralMax = 36000){
+/** 
+ * @brief
+ * Used to control the postion of the lady brown mechnisam on the robot with a PID control loop
+ * 
+ * @param desiredAngle the target angle in centidegrees
+ * @param kP Proportional gain for PID 
+ * @param kI Integral gain for the PID
+ * @param kD Derivative gain for the PID 
+ * @param settleError (Optional) Threshold for acceptable error to consider the target reached. Defaults to 250.
+**/
+void liftPID(float desiredAngle, float kP, float kD, float settleError = 250){
+    static float prevError = 0;
+    static float error = 0;
+    static float voltScalar = 1.5;
     //desired angle in centidegrees (0-36,000)
     //settle error 250 cdeg
     //idle = 0, primed = 26, scored = 140
@@ -275,15 +279,10 @@ void liftPID(float desiredAngle, float kP, float kI, float kD, float settleError
     pros::lcd::set_text(4, std::to_string(angle));
     
 
-    integral += error;
-
-    if(integral >= 36000){
-        integral = 0;
-    }
 
     derivative = error - prevError;
 
-    float power = (error * kP + integral * kI + derivative * kD) * voltScalar;
+    float power = (error * kP + derivative * kD) * voltScalar;
     pros::lcd::set_text(3, std::to_string(power));
 
     pros::lcd::set_text(5, std::to_string(fabs(error)));
@@ -291,7 +290,7 @@ void liftPID(float desiredAngle, float kP, float kI, float kD, float settleError
         ws.brake();
         return;
     }
-    
+
     if(power > 12000){
         power = 12000;
     } else if( power < -12000){
@@ -313,34 +312,30 @@ void liftPID(float desiredAngle, float kP, float kI, float kD, float settleError
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-float liftP = 3;
-float liftI = 0;
-float liftD = 1;
+
 
 void opcontrol() {
+    static float liftP = 3;
+    static float liftD = 1;
     ws.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
+    int i = 0;
     bool clamp = false;
     intake.set_voltage_limit(12000);
-    int i = 0;
+   
     wsr.reset_position();
     
     // controller
     // loop to continuously update motors
     while (true) {
-        if(controller.get_digital_new_press(DIGITAL_DOWN)){
-            if(!clamp){
-                clamp = true;
-                clampPistons.set_value(true);
-            } else {
-                clamp = false;
-                clampPistons.set_value(false);
-            }
+        if(controller.get_digital_new_press(DIGITAL_L1)){
+            clamp = !clamp;
+            clampPistons.set_value(clamp);
+            
         }
 
-        if(controller.get_digital(DIGITAL_R2)){
+        if(controller.get_digital(DIGITAL_R1)){
             intake.move_voltage(12000);
-        } else if (controller.get_digital(DIGITAL_R1)){
+        } else if (controller.get_digital(DIGITAL_R2)){
             intake.move_voltage(-12000);
         } else {
             intake.brake();
@@ -353,7 +348,7 @@ void opcontrol() {
         //     ws.brake();
         // }
 
-        if(controller.get_digital_new_press(DIGITAL_X)){
+        if(controller.get_digital_new_press(DIGITAL_L2)){
             i++;
             if( i > 2 ){
                 i = 0;
@@ -362,13 +357,13 @@ void opcontrol() {
         
         switch(i){
                 case 0:
-                liftPID(0, liftP, liftI, liftD, 250);
+                liftPID(0, liftP, liftD);
                 break;
                 case 1:
-                liftPID(2600, liftP, liftI, liftD, 250);
+                liftPID(2600, liftP, liftD);
                 break;
                 case 2:
-                liftPID(14500, liftP, liftI, liftD, 250);
+                liftPID(14500, liftP, liftD);
             }
             pros::lcd::set_text(2, std::to_string(i));
 
@@ -376,7 +371,7 @@ void opcontrol() {
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         // move the chassis with curvature drive
-        antiTipDrive(rightX, leftY, 500, 900, 15, 20, 1.03);
+        antiTipDrive(rightX, leftY, 500, 900, 15, 20, 1.05, 1.09);
         // delay to save resources
         pros::delay(10);
     }
