@@ -35,6 +35,8 @@
 #define PROS_USE_LITERALS
 
 #include "api.h"
+#include "auton.hpp"
+#include "externs.hpp"
 
 /**
  * You should add more #includes here

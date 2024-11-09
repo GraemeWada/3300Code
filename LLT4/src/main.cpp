@@ -2,102 +2,11 @@
 #include "lemlib/api.hpp" // IWYU pragma: keep
 //Auto selector LIB
 #include "robodash/api.h"
+
 //github 
 //https://github.com/unwieldycat/robodash/blob/main/src/main.cpp
 
 
-pros::Controller controller(pros::E_CONTROLLER_MASTER);
-pros::MotorGroup left_mg({-2, -1, -4}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-pros::MotorGroup right_mg({3, 14, 15}, pros::MotorGearset::blue);
-pros::Motor intake(10, pros::MotorGearset::blue);
-pros::Motor ws(11, pros::MotorGearset::red);
-
-pros::Rotation wsr(19);
-
-pros::ADIDigitalOut clampPistons ('H');
-//trackwidth 29cm = ~11.417in
-lemlib::Drivetrain drivetrain(&left_mg, &right_mg, 11.417, lemlib::Omniwheel::NEW_325, 450, 2);
-
-/**
- * @brief Lady brown mech states
- * 
- * @details
- * Prime: Load state  
- * Prelim: Initial state before scoring  
- * Score: Scoring state
- */
-enum LBPos {
-    LB_Prelim,  
-    LB_Prime,   
-    LB_Score    
-};
-
-//odom
-pros::Imu imu(20);
-// // pros::Rotation rv(7); //vert
-// pros::Rotation rh(-6); //horiz set to negative if reverse
-
-// lemlib::TrackingWheel htw(&rh, lemlib::Omniwheel::NEW_275, 2.125); // third value is tracking center offset
-// lemlib::TrackingWheel vtw(&rv, 3.25, 5.25);
-
-// lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1, set to null
-//                             nullptr, // vertical tracking wheel 2, set to nullptr as we are using IMEs
-//                             &htw, // horizontal tracking wheel 1
-//                             nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
-//                             &imu // inertial sensor
-// );
-
-lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1, set to null
-                            nullptr, // vertical tracking wheel 2, set to nullptr as we are using IMEs
-                            nullptr, // horizontal tracking wheel 1
-                            nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
-                            &imu // inertial sensor
-);
-
-// lateral PID controller
-lemlib::ControllerSettings lateral_controller(4.4, // proportional gain (kP)
-                                              0, // integral gain (kI)
-                                              3.75, // derivative gain (kD)
-                                              0, // anti windup
-                                              0, // small error range, in inches
-                                              0, // small error range timeout, in milliseconds
-                                              0, // large error range, in inches
-                                              0, // large error range timeout, in milliseconds
-                                              0 // maximum acceleration (slew)
-);
-
-// angular PID controller
-lemlib::ControllerSettings angular_controller(3.4, // proportional gain (kP)
-                                              0.01, // integral gain (kI)
-                                              15.25, // derivative gain (kD)
-                                              0, // anti windup
-                                              0, // small error range, in degrees
-                                              0, // small error range timeout, in milliseconds
-                                              0, // large error range, in degrees
-                                              0, // large error range timeout, in milliseconds
-                                              0 // maximum acceleration (slew)
-);
-
-// input curve for throttle input during driver control
-lemlib::ExpoDriveCurve throttle_curve(10, // joystick deadband out of 127
-                                     15, // minimum output where drivetrain will move out of 127
-                                     1.03 // expo curve gain
-);
-
-// input curve for steer input during driver control
-lemlib::ExpoDriveCurve steer_curve(10, // joystick deadband out of 127
-                                  15, // minimum output where drivetrain will move out of 127
-                                  1.03 // expo curve gain
-);
-
-
-lemlib::Chassis chassis(drivetrain, // drivetrain settings
-                        lateral_controller, // lateral PID settings
-                        angular_controller, // angular PID settings
-                        sensors,
-						&throttle_curve,
-						&steer_curve // odometry sensors
-);
 
 /**
  * A callback function for LLEMU's center button.
@@ -171,13 +80,10 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-ASSET(path1_txt);
 
 void autonomous() {
-	chassis.setPose(0,0,0);
     // turn to face heading 90 with a very long timeout
-    chassis.turnToHeading(90, 100000);
-    // chassis.follow(path1_txt, 10, 4000);
+    blueNegtive();    // chassis.follow(path1_txt, 10, 4000);
 
 }
 
@@ -218,7 +124,7 @@ void antiTipDrive(int left, int right, double changeRate, int maxChange, float d
     float rightC= driveCurve(right, deadband, minOutput,Rcurve);
 
     float leftPower = ( leftC + rightC) * 12000 / 127;
-    float rightPower = (right - left) * 12000 / 127;
+    float rightPower = (rightC - leftC) * 12000 / 127;
 
 
     int leftChange  = leftPower - prevLeftPower;
