@@ -9,6 +9,8 @@ extern pros::Rotation wsr;
 extern pros::Rotation odomRot;
 
 extern pros::ADIDigitalOut clampPistons;
+
+extern pros::ADIDigitalOut boink;
 //trackwidth 29cm = ~11.417in
 extern lemlib::Drivetrain drivetrain;
 

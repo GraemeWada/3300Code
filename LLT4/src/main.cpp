@@ -83,8 +83,8 @@ void competition_initialize() {}
 
 void autonomous() {
     // turn to face heading 90 with a very long timeout
-    blueNegtive();    // chassis.follow(path1_txt, 10, 4000);
-
+    // blueNegtive();    // chassis.follow(path1_txt, 10, 4000);
+    blue_test();
 }
 
 //copied from lemlib
@@ -226,6 +226,7 @@ void opcontrol() {
     ws.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     int i = 0;
     bool clamp = false;
+    bool boinked = false;
     intake.set_voltage_limit(12000);
    
     wsr.reset_position();
@@ -236,7 +237,10 @@ void opcontrol() {
         if(controller.get_digital_new_press(DIGITAL_L1)){
             clamp = !clamp;
             clampPistons.set_value(clamp);
-            
+        }
+        if(controller.get_digital_new_press(DIGITAL_UP)){
+            boinked = !boinked;
+            boink.set_value(boinked);
         }
 
         if(controller.get_digital(DIGITAL_R1)){

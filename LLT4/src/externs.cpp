@@ -12,8 +12,10 @@ pros::Rotation wsr(19);
 pros::Rotation odomRot(-7);
 
 pros::ADIDigitalOut clampPistons ('H');
+pros::ADIDigitalOut boink ('G') ;
 //trackwidth 29cm = ~11.417in
-lemlib::Drivetrain drivetrain(&left_mg, &right_mg, 11.417, lemlib::Omniwheel::NEW_325, 450, 2);
+lemlib::Drivetrain drivetrain(&left_mg, &right_mg, 11.18, lemlib::Omniwheel::NEW_325, 450, 2);
+
 
 
 
