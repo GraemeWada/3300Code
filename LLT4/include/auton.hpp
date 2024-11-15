@@ -1,2 +1,2 @@
 extern void blueNegtive();
-extern void blue_test();
+extern void blueNegtive2();

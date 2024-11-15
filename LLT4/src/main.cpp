@@ -6,6 +6,10 @@
 //github 
 //https://github.com/unwieldycat/robodash/blob/main/src/main.cpp
 
+rd::Selector selector({
+    {"Blue - auton", &blueNegtive2}
+});
+rd::Console console;
 
 
 /**
@@ -30,20 +34,22 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
     chassis.calibrate();
-    pros::Task screenTask([&]() {
-        while (true) {
-            // print robot location to the brain screen
-            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-            // log position telemetry
-            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
-            // delay to save resources
-            pros::delay(50);
-    }
-    });
+
+    selector.focus();
+
+    // pros::Task screenTask([&]() {
+    //     while (true) {
+    //         // print robot location to the brain screen
+    //         pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+    //         pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+    //         pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+    //         // log position telemetry
+    //         lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+    //         // delay to save resources
+    //         pros::delay(50);
+    // }
+    // });
 	// while (true){
     //     pros::lcd::print(1, "Rotation Sensor H: %i", rh.get_position());
 	// 	//pros::lcd::print(0, "Rotation Sensor V: %i", rh.get_position());
@@ -84,8 +90,8 @@ void competition_initialize() {}
 void autonomous() {
     // turn to face heading 90 with a very long timeout
     // blueNegtive();    // chassis.follow(path1_txt, 10, 4000);
-    blue_test();
-}
+        wsr.reset_position();
+blueNegtive2();}
 
 //copied from lemlib
 float driveCurve(float input, float deadband, float minOutput, float curve) {
@@ -229,7 +235,6 @@ void opcontrol() {
     bool boinked = false;
     intake.set_voltage_limit(12000);
    
-    wsr.reset_position();
     
     // controller
     // loop to continuously update motors
@@ -273,7 +278,7 @@ void opcontrol() {
                 liftPID(2600, liftP, liftD);
                 break;
                 case 2:
-                liftPID(14500, liftP, liftD);
+                liftPID(14000, liftP, liftD);
             }
             pros::lcd::set_text(2, std::to_string(i));
 
