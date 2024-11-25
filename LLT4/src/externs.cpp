@@ -8,7 +8,7 @@ pros::MotorGroup right_mg({1, -15, 16}, pros::MotorGearset::blue);
 pros::Motor intake(18, pros::MotorGearset::blue);
 pros::Motor ws(20, pros::MotorGearset::red);
 
-pros::Rotation wsr(21);
+pros::Rotation wsr(3);
 // pros::Rotation odomRot(-7);
 
 pros::Rotation verticalRota(-17);
@@ -23,7 +23,7 @@ lemlib::Drivetrain drivetrain(&left_mg, &right_mg, 11.5, lemlib::Omniwheel::NEW_
 
 
 //odom
-pros::Imu imu(2);
+pros::Imu imu(14);
 // // pros::Rotation rv(7); //vert
 // pros::Rotation rh(-6); //horiz set to negative if reverse
 

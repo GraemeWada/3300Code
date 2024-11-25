@@ -7,7 +7,14 @@
 //https://github.com/unwieldycat/robodash/blob/main/src/main.cpp
 
 rd::Selector selector({
-    {"Blue - auton", &blueNegtive2}
+    //B or R indicates team, + or - indicates corner side
+    //S or R indicates safe or rush
+    //#pt indicates points
+    //#/3 indicates number of local WP tasks
+    //#/4 indicates number of sig WP tasks
+    {"B- S 5pt 2/3 1/4", &blueNegativeSafe},
+    {"B+ S 4pt 1/3 1/4", &bluePositiveSafe},
+    {"B+ S 6pt 2/3 1/4", &bluePositiveSafe2}
 });
 rd::Console console;
 
@@ -91,8 +98,9 @@ void competition_initialize() {}
 void autonomous() {
     // turn to face heading 90 with a very long timeout
     // blueNegtive();    // chassis.follow(path1_txt, 10, 4000);
-        wsr.reset_position();
-blueNegtive2();}
+    wsr.reset_position();
+    bluePositiveSafe2();
+}
 
 //copied from lemlib
 float driveCurve(float input, float deadband, float minOutput, float curve) {
