@@ -3,33 +3,36 @@
 #include"lemlib/api.hpp"
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
-pros::MotorGroup left_mg({-2, -1, -4}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-pros::MotorGroup right_mg({3, 14, 15}, pros::MotorGearset::blue);
-pros::Motor intake(10, pros::MotorGearset::blue);
-pros::Motor ws(11, pros::MotorGearset::red);
+pros::MotorGroup left_mg({-11, 12, -13}, pros::MotorGearset::blue);    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
+pros::MotorGroup right_mg({1, -15, 16}, pros::MotorGearset::blue);
+pros::Motor intake(18, pros::MotorGearset::blue);
+pros::Motor ws(20, pros::MotorGearset::red);
 
-pros::Rotation wsr(19);
-pros::Rotation odomRot(-7);
+pros::Rotation wsr(21);
+// pros::Rotation odomRot(-7);
+
+pros::Rotation verticalRota(-17);
+pros::Rotation horizontalRota(-19);
 
 pros::ADIDigitalOut clampPistons ('H');
 pros::ADIDigitalOut boink ('G') ;
 //trackwidth 29cm = ~11.417in
-lemlib::Drivetrain drivetrain(&left_mg, &right_mg, 11.18, lemlib::Omniwheel::NEW_325, 450, 2);
+lemlib::Drivetrain drivetrain(&left_mg, &right_mg, 11.5, lemlib::Omniwheel::NEW_325, 450, 2);
 
 
 
 
 //odom
-pros::Imu imu(20);
+pros::Imu imu(2);
 // // pros::Rotation rv(7); //vert
 // pros::Rotation rh(-6); //horiz set to negative if reverse
 
-lemlib::TrackingWheel htw(&odomRot, lemlib::Omniwheel::NEW_2, 3); // third value is tracking center offset
-// lemlib::TrackingWheel vtw(&rv, 3.25, 5.25);
+lemlib::TrackingWheel htw(&horizontalRota, lemlib::Omniwheel::NEW_275, -3); // third value is tracking center offset
+lemlib::TrackingWheel vtw(&verticalRota, lemlib::Omniwheel::NEW_2, -0.25);
 
-lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1, set to null
+lemlib::OdomSensors sensors(&vtw, // vertical tracking wheel 1, set to null
                             nullptr, // vertical tracking wheel 2, set to nullptr as we are using IMEs
-                            &htw, // horizontal tracking wheel 1
+                            nullptr, // horizontal tracking wheel 1
                             nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
                             &imu // inertial sensor
 );

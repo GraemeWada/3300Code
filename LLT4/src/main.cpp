@@ -51,10 +51,11 @@ void initialize() {
     // }
     // });
 	// while (true){
-    //     pros::lcd::print(1, "Rotation Sensor H: %i", rh.get_position());
-	// 	//pros::lcd::print(0, "Rotation Sensor V: %i", rh.get_position());
+    //     pros::lcd::print(1, "Rotation Sensor H: %i", verticalRota.get_position());
+	// 	pros::lcd::print(0, "Rotation Sensor V: %i", horizontalRota.get_position());
     //     pros::delay(10); // delay to save resources. DO NOT REMOVE
 	// }
+    
 }
 
 /**
@@ -234,7 +235,8 @@ void opcontrol() {
     bool clamp = false;
     bool boinked = false;
     intake.set_voltage_limit(12000);
-   
+    ws.tare_position();
+    bool fast = false;
     
     // controller
     // loop to continuously update motors
@@ -249,19 +251,12 @@ void opcontrol() {
         }
 
         if(controller.get_digital(DIGITAL_R1)){
-            intake.move_voltage(12000);
-        } else if (controller.get_digital(DIGITAL_R2)){
             intake.move_voltage(-12000);
+        } else if (controller.get_digital(DIGITAL_R2)){
+            intake.move_voltage(12000);
         } else {
             intake.brake();
         }
-        // if(controller.get_digital(DIGITAL_L2)){
-        //     ws.move_voltage(12000);
-        // } else if (controller.get_digital(DIGITAL_L1)){
-        //     ws.move_voltage(-12000);
-        // } else {
-        //     ws.brake();
-        // }
 
         if(controller.get_digital_new_press(DIGITAL_L2)){
             i++;
@@ -270,17 +265,17 @@ void opcontrol() {
             }
         }
         
-        switch(i){
-                case 0:
-                liftPID(0, liftP, liftD);
-                break;
-                case 1:
-                liftPID(2600, liftP, liftD);
-                break;
-                case 2:
-                liftPID(14000, liftP, liftD);
-            }
-            pros::lcd::set_text(2, std::to_string(i));
+        // switch(i){
+        //         case 0:
+        //         liftPID(0, liftP, liftD);
+        //         break;
+        //         case 1:
+        //         liftPID(2600, liftP, liftD);
+        //         break;
+        //         case 2:
+        //         liftPID(14000, liftP, liftD);
+        //     }
+        //     pros::lcd::set_text(2, std::to_string(i));
 
         // get joystick positions
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);

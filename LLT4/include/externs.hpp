@@ -6,7 +6,9 @@ extern pros::Motor intake;
 extern pros::Motor ws;
 
 extern pros::Rotation wsr;
-extern pros::Rotation odomRot;
+// extern pros::Rotation odomRot;
+extern pros::Rotation verticalRota;
+extern pros::Rotation horizontalRota;
 
 extern pros::ADIDigitalOut clampPistons;
 
@@ -22,6 +24,7 @@ extern pros::Imu imu;
 // pros::Rotation rh(-6); //horiz set to negative if reverse
 
 extern lemlib::TrackingWheel htw; // third value is tracking center offset
+extern lemlib::TrackingWheel vtw;
 // lemlib::TrackingWheel vtw(&rv, 3.25, 5.25);
 
 extern lemlib::OdomSensors sensors;
