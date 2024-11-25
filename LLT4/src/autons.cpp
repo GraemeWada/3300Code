@@ -195,3 +195,82 @@ void bluePositiveSafe2(){
     clampPistons.set_value(false);
     chassis.moveToPoint(24,5,5000);
 }
+
+/**************************************/
+/*                                    */
+/*                                    */
+/*                                    */
+/*             RED AUTONS             */
+/*                                    */
+/*                                    */
+/*                                    */
+/***************************************/
+void redNegativeSafe(){
+    chassis.setPose(-54, 24, -90);
+    chassis.moveToPoint(-23, 24, 5000, {.forwards = false});
+    chassis.waitUntil(24);
+    clampPistons.set_value(true);
+    pros::delay(500);
+    intake.move_voltage(-12000);
+    pros::delay(500);
+    // intake.move_voltage(12000);
+    chassis.moveToPoint(-24, 47, 5000);
+    chassis.waitUntilDone();
+    // intake.move_voltage(-12000);
+    pros::delay(500);
+    chassis.moveToPoint(-8, 43, 5000);
+    chassis.waitUntilDone();
+    pros::delay(500);
+    intake.move_voltage(0);
+    chassis.moveToPoint(-23,0,5000);
+    clampPistons.set_value(false);
+    // chassis.moveToPoint(24, 47, 5000, {.forwards = false});
+    // chassis.waitUntilDone();
+    // chassis.moveToPoint(8, 52, 5000);
+}
+
+void redPositiveSafe(){
+    chassis.setPose(-54, -24, -90);
+    chassis.moveToPoint(-24, -24, 5000, {.forwards=false, .maxSpeed=70});
+    chassis.waitUntil(24);
+    clampPistons.set_value(true);
+    pros::delay(500);
+    intake.move_voltage(-12000);
+    pros::delay(200);
+    chassis.moveToPoint(-24,-48,5000);
+    chassis.waitUntilDone();
+    pros::delay(500);
+    intake.move_voltage(0);
+    clampPistons.set_value(false);
+    chassis.moveToPoint(-24,0,5000);
+}
+
+void redPositiveSafe2(){
+    chassis.setPose(-60, -24, 0);
+    chassis.moveToPoint(-61, 0, 5000);
+    chassis.turnToHeading(90, 1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-70, 0, 1000, {.forwards=false});
+    pros::delay(50);
+    intake.move_voltage(-12000);
+    pros::delay(300);
+    intake.move_voltage(12000);
+    pros::delay(100);
+    intake.move_voltage(0);
+
+    chassis.moveToPoint(-60, -24, 5000, {.forwards=false});
+    chassis.waitUntilDone();
+    
+    chassis.moveToPoint(-24,-24,5000, {.forwards=false, .maxSpeed=70});
+    chassis.waitUntilDone();
+    clampPistons.set_value(true);
+    pros::delay(500);
+    intake.move_voltage(-12000);
+    
+    chassis.moveToPoint(-24,-48,5000);
+    chassis.waitUntilDone();
+    pros::delay(1000);
+    intake.move_voltage(0);
+    clampPistons.set_value(false);
+    chassis.moveToPoint(-24,5,5000);
+}

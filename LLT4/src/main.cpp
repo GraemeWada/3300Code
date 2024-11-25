@@ -7,14 +7,17 @@
 //https://github.com/unwieldycat/robodash/blob/main/src/main.cpp
 
 rd::Selector selector({
-    //B or R indicates team, + or - indicates corner side
+    //Blue or Red indicates team, + or - indicates corner side
     //S or R indicates safe or rush
     //#pt indicates points
     //#/3 indicates number of local WP tasks
     //#/4 indicates number of sig WP tasks
-    {"B- S 5pt 2/3 1/4", &blueNegativeSafe},
-    {"B+ S 4pt 1/3 1/4", &bluePositiveSafe},
-    {"B+ S 6pt 2/3 1/4", &bluePositiveSafe2}
+    {"Blue- S 5pt 2/3 1/4", &blueNegativeSafe},
+    {"Blue+ S 4pt 1/3 1/4", &bluePositiveSafe},
+    {"Blue+ S 6pt 2/3 1/4", &bluePositiveSafe2},
+    {"Red- S 5pt 2/3 1/4", &redNegativeSafe},
+    {"Red+ S 4pt 1/3 1/4", &redPositiveSafe},
+    {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2}
 });
 rd::Console console;
 
