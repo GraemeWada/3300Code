@@ -274,3 +274,85 @@ void redPositiveSafe2(){
     clampPistons.set_value(false);
     chassis.moveToPoint(-24,5,5000);
 }
+
+
+
+/**************************************/
+/*                                    */
+/*                                    */
+/*                                    */
+/*               Skills               */
+/*                                    */
+/*                                    */
+/*                                    */
+/***************************************/
+void skills1(){
+    chassis.setPose(-60,0,90);
+    intake.move_voltage(-12000);
+    pros::delay(500);
+    intake.move_voltage(12000);
+    pros::delay(100);
+    intake.move_voltage(0);
+
+    chassis.moveToPoint(-48,24,5000,{.forwards=false});
+    chassis.waitUntilDone();
+
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(100);
+    intake.move_voltage(-12000);
+
+    chassis.moveToPoint(-24,24,5000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-24, 48, 5000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-60, 48, 5000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-48, 60, 2000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-60,63,2000,{.forwards=false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(false);
+    intake.move_voltage(0);
+    pros::delay(200);
+    
+
+    //part 2
+
+    chassis.moveToPoint(-48,-24,5000,{.forwards=false});
+    chassis.waitUntilDone();
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(100);
+    intake.move_voltage(-12000);
+
+    chassis.moveToPoint(-24,-24,5000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-24, -48, 5000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-60, -48, 5000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-48, -60, 2000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-60,-63,2000,{.forwards=false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(false);
+    pros::delay(200);
+
+}

@@ -6,3 +6,4 @@ extern void bluePositiveSafe2();
 extern void redNegativeSafe();
 extern void redPositiveSafe();
 extern void redPositiveSafe2();
+extern void skills1();
