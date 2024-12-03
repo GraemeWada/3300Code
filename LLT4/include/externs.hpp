@@ -25,6 +25,8 @@ extern pros::Imu imu;
 
 extern lemlib::TrackingWheel htw; // third value is tracking center offset
 extern lemlib::TrackingWheel vtw;
+
+extern pros::Optical color;
 // lemlib::TrackingWheel vtw(&rv, 3.25, 5.25);
 
 extern lemlib::OdomSensors sensors;

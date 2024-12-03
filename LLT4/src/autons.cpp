@@ -126,6 +126,19 @@ void blueNegtive2()
 }
 
 
+
+/**************************************/
+/*                                    */
+/*                                    */
+/*                                    */
+/*             NEW AUTONS             */
+/*                                    */
+/*                                    */
+/*                                    */
+/***************************************/
+
+
+
 void blueNegativeSafe(){
     chassis.setPose(54, 24, 90);
     chassis.moveToPoint(23, 24, 5000, {.forwards = false});
@@ -139,15 +152,19 @@ void blueNegativeSafe(){
     chassis.waitUntilDone();
     // intake.move_voltage(-12000);
     pros::delay(500);
-    chassis.moveToPoint(8, 43, 5000);
+    chassis.moveToPoint(9, 43, 5000);
     chassis.waitUntilDone();
-    pros::delay(500);
-    intake.move_voltage(0);
-    chassis.moveToPoint(23,0,5000);
-    clampPistons.set_value(false);
-    // chassis.moveToPoint(24, 47, 5000, {.forwards = false});
+    pros::delay(700);
+    // intake.move_voltage(0);
+    // chassis.moveToPose(39,39, 45, 10000, {.forwards = false,.maxSpeed=60});
     // chassis.waitUntilDone();
-    // chassis.moveToPoint(8, 52, 5000);
+    // intake.move_voltage(-12000);
+    // clampPistons.set_value(false);
+    chassis.moveToPoint(24, 47, 5000, {.forwards = false});
+    chassis.waitUntilDone();
+    // intake.move_voltage(0);
+    chassis.moveToPoint(9, 50, 5000);
+    chassis.moveToPoint(24,3,5000,{.maxSpeed=50});
 }
 
 void bluePositiveSafe(){
@@ -192,8 +209,7 @@ void bluePositiveSafe2(){
     chassis.waitUntilDone();
     pros::delay(1000);
     intake.move_voltage(0);
-    clampPistons.set_value(false);
-    chassis.moveToPoint(24,5,5000);
+    chassis.moveToPoint(24,5,5000, {.maxSpeed = 50});
 }
 
 /**************************************/
@@ -206,7 +222,7 @@ void bluePositiveSafe2(){
 /*                                    */
 /***************************************/
 void redNegativeSafe(){
-    chassis.setPose(-54, 24, -90);
+    chassis.setPose(-54, 24, 270);
     chassis.moveToPoint(-23, 24, 5000, {.forwards = false});
     chassis.waitUntil(24);
     clampPistons.set_value(true);
@@ -218,19 +234,24 @@ void redNegativeSafe(){
     chassis.waitUntilDone();
     // intake.move_voltage(-12000);
     pros::delay(500);
-    chassis.moveToPoint(-8, 43, 5000);
+    chassis.moveToPoint(-12, 43, 5000);
     chassis.waitUntilDone();
-    pros::delay(500);
-    intake.move_voltage(0);
-    chassis.moveToPoint(-23,0,5000);
-    clampPistons.set_value(false);
-    // chassis.moveToPoint(24, 47, 5000, {.forwards = false});
+    pros::delay(700);
+    // intake.move_voltage(0);
+    // chassis.moveToPose(39,39, 45, 10000, {.forwards = false,.maxSpeed=60});
     // chassis.waitUntilDone();
-    // chassis.moveToPoint(8, 52, 5000);
+    // intake.move_voltage(-12000);
+    // clampPistons.set_value(false);
+    chassis.moveToPoint(-24, 47, 5000, {.forwards = false});
+    chassis.waitUntilDone();
+    // intake.move_voltage(0);
+    chassis.moveToPoint(-10, 50, 5000);
+    pros::delay(500);
+    chassis.moveToPoint(-24,3,5000,{.maxSpeed=50});
 }
 
 void redPositiveSafe(){
-    chassis.setPose(-54, -24, -90);
+    chassis.setPose(-54, -24, 270);
     chassis.moveToPoint(-24, -24, 5000, {.forwards=false, .maxSpeed=70});
     chassis.waitUntil(24);
     clampPistons.set_value(true);
@@ -275,6 +296,38 @@ void redPositiveSafe2(){
     chassis.moveToPoint(-24,5,5000);
 }
 
+void redElim(){
+       chassis.setPose(-54, 24, 270);
+    chassis.moveToPoint(-23, 24, 5000, {.forwards = false});
+    chassis.waitUntil(24);
+    clampPistons.set_value(true);
+    pros::delay(500);
+    intake.move_voltage(-12000);
+    pros::delay(500);
+    // intake.move_voltage(12000);
+    chassis.moveToPoint(-24, 47, 5000);
+    chassis.waitUntilDone();
+    // intake.move_voltage(-12000);
+    pros::delay(500);
+    chassis.moveToPoint(-12, 43, 5000);
+    chassis.waitUntilDone();
+    pros::delay(700);
+    // intake.move_voltage(0);
+    // chassis.moveToPose(39,39, 45, 10000, {.forwards = false,.maxSpeed=60});
+    // chassis.waitUntilDone();
+    // intake.move_voltage(-12000);
+    // clampPistons.set_value(false);
+    chassis.moveToPoint(-24, 47, 5000, {.forwards = false});
+    chassis.waitUntilDone();
+    // intake.move_voltage(0);
+    chassis.moveToPoint(-10, 50, 5000);
+    pros::delay(500);
+    chassis.moveToPoint(-24, 47, 5000, {.forwards = false});
+    chassis.waitUntilDone();
+    chassis.moveToPoint(54, 60, 5000);
+    chassis.waitUntilDone();
+}
+
 
 
 /**************************************/
@@ -294,15 +347,20 @@ void skills1(){
     pros::delay(100);
     intake.move_voltage(0);
 
-    chassis.moveToPoint(-48,24,5000,{.forwards=false});
+    chassis.moveToPoint(-48, 0, 2000);
+    chassis.waitUntilDone();
+    chassis.turnToHeading(180, 1000);
+    chassis.waitUntilDone();
+
+    chassis.moveToPoint(-48,24,5000,{.forwards=false, .maxSpeed = 60});
     chassis.waitUntilDone();
 
     pros::delay(400);
     clampPistons.set_value(true);
-    pros::delay(100);
+    pros::delay(200);
     intake.move_voltage(-12000);
 
-    chassis.moveToPoint(-24,24,5000);
+    chassis.moveToPoint(-18,24,5000);
     chassis.waitUntilDone();
     pros::delay(200);
 
@@ -310,7 +368,7 @@ void skills1(){
     chassis.waitUntilDone();
     pros::delay(200);
 
-    chassis.moveToPoint(-60, 48, 5000);
+    chassis.moveToPoint(-60, 48, 5000, {.maxSpeed = 45});
     chassis.waitUntilDone();
     pros::delay(200);
 
@@ -325,13 +383,13 @@ void skills1(){
     pros::delay(200);
     
 
-    //part 2
+    // part 2
 
-    chassis.moveToPoint(-48,-24,5000,{.forwards=false});
+    chassis.moveToPoint(-48,-24,5000,{.forwards=false, .maxSpeed = 70});
     chassis.waitUntilDone();
     pros::delay(400);
     clampPistons.set_value(true);
-    pros::delay(100);
+    pros::delay(200);
     intake.move_voltage(-12000);
 
     chassis.moveToPoint(-24,-24,5000);
@@ -342,7 +400,7 @@ void skills1(){
     chassis.waitUntilDone();
     pros::delay(200);
 
-    chassis.moveToPoint(-60, -48, 5000);
+    chassis.moveToPoint(-60, -48, 5000, {.maxSpeed = 45});
     chassis.waitUntilDone();
     pros::delay(200);
 
@@ -355,4 +413,295 @@ void skills1(){
     clampPistons.set_value(false);
     pros::delay(200);
 
+    //part 3
+
+    chassis.moveToPoint(60,-23,5000,{.forwards=false});
+    chassis.waitUntilDone();
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(100);
+    chassis.moveToPoint(65,-64,3000,{.forwards=false});
+    clampPistons.set_value(false);
+    pros::delay(500);
+    chassis.moveToPoint(46,-24,3000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(48, 0, 3000, {.forwards=false});
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(200);
+    intake.move_voltage(-12000);
+    chassis.moveToPoint(24,24,3000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(24,48,3000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(60,61,3000,{.forwards=false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(false);
+    pros::delay(300);
+    chassis.moveToPoint(12,12,5000);
+}
+
+void cornerSkills(){
+    chassis.setPose(-60,0,90);
+    intake.move_voltage(-12000);
+    pros::delay(500);
+    intake.move_voltage(12000);
+    pros::delay(100);
+    intake.move_voltage(0);
+
+    chassis.moveToPoint(-48, 0, 2000);
+    chassis.waitUntilDone();
+    chassis.turnToHeading(180, 1000);
+    chassis.waitUntilDone();
+
+    chassis.moveToPoint(-48,24,5000,{.forwards=false, .maxSpeed = 60});
+    chassis.waitUntilDone();
+
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(200);
+    intake.move_voltage(-12000);
+
+    chassis.moveToPoint(-18,24,5000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-24, 48, 5000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-60, 48, 5000, {.maxSpeed = 45});
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-48, 60, 2000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-60,63,2000,{.forwards=false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(false);
+    intake.move_voltage(0);
+    pros::delay(200);
+    
+
+    // part 2
+
+    chassis.moveToPoint(-48,-24,5000,{.forwards=false, .maxSpeed = 70});
+    chassis.waitUntilDone();
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(200);
+    intake.move_voltage(-12000);
+
+    chassis.moveToPoint(-55,-47,2000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-60,-60,1000,{.forwards=false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(false);
+    pros::delay(300);
+
+    chassis.moveToPoint(36,-32,5000);
+    chassis.waitUntilDone();   
+    chassis.moveToPoint(60,-24,2000, {.forwards=false});
+    chassis.waitUntilDone();
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(100);
+
+    chassis.moveToPoint(62,-57,2000,{.forwards=false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(false);
+    pros::delay(300);
+
+    chassis.moveToPoint(60,24,3000,{.forwards=false});
+    chassis.waitUntilDone();
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(100);
+
+    chassis.moveToPoint(62,57,2000,{.forwards=false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(false);
+    pros::delay(300);
+}
+
+void skills2(){
+    ws.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    //alliance wall stake
+    chassis.setPose(-62,0,90);
+    intake.move_voltage(-12000);
+    pros::delay(500);
+    intake.move_voltage(12000);
+    pros::delay(100);
+    intake.move_voltage(0);
+
+    //move forward
+    chassis.moveToPoint(-48, 0, 1000);
+    chassis.waitUntilDone();
+
+    //turn to goal
+    chassis.turnToHeading(180, 1000);
+    chassis.waitUntilDone();
+
+    //pick up goal
+    chassis.moveToPoint(-48,20,1500,{.forwards=false});
+    chassis.waitUntilDone();
+
+    //clamp
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(200);
+    intake.move_voltage(-12000);
+
+    //ring 1
+    chassis.moveToPoint(-24,24,1500);
+    chassis.waitUntilDone();
+    pros::delay(300);
+
+    //ring near wall stake
+    chassis.moveToPoint(0,60,2000, {.maxSpeed=80});
+    chassis.waitUntilDone();
+    pros::delay(300);
+
+    //line of 3 rings
+    chassis.moveToPoint(-24,48,1000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-48,48,2000,{.maxSpeed=60});
+    chassis.waitUntilDone();
+    pros::delay(100);
+
+    chassis.moveToPoint(-60,48,1000,{.maxSpeed=60});
+    chassis.waitUntilDone();
+    pros::delay(100);
+
+    //last ring
+    chassis.moveToPoint(-46,60,1000);
+    chassis.waitUntilDone();
+    pros::delay(100);
+    
+    //corner
+    chassis.moveToPose(-64,64,135,1000,{.forwards=false}); //
+    chassis.waitUntilDone();
+    intake.move_voltage(12000);
+    pros::delay(200);
+    clampPistons.set_value(false);
+    pros::delay(200);
+    intake.move_voltage(0);
+
+    //Quadrant 2
+
+    //move outwards
+    chassis.moveToPoint(-48,0,3000,{.maxSpeed=80});
+    chassis.waitUntilDone();
+    //turn to goal
+    chassis.turnToHeading(0,1500);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-50,-22,1000,{.forwards=false}); //
+    chassis.waitUntilDone();
+    //clamp goal
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(200);
+    intake.move_voltage(-12000);
+
+    //ring 1
+    chassis.moveToPoint(-24,-24,1500);
+    chassis.waitUntilDone();
+    pros::delay(300);
+
+    //ring near wall stake
+    chassis.moveToPoint(0,-60,2000, {.maxSpeed=80});
+    chassis.waitUntilDone();
+    pros::delay(300);
+
+    //line of 3 rings
+    chassis.moveToPoint(-24,-48,1000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+
+    chassis.moveToPoint(-48,-48,2000,{.maxSpeed=60});
+    chassis.waitUntilDone();
+    pros::delay(100);
+
+    chassis.moveToPoint(-60,-48,1000,{.maxSpeed=60});
+    chassis.waitUntilDone();
+    pros::delay(100);
+
+    //last ring
+    chassis.moveToPoint(-46,-60,1000);
+    chassis.waitUntilDone();
+    pros::delay(300);
+    
+    //corner
+    chassis.moveToPose(-64,-64,45,1000,{.forwards=false});
+    chassis.waitUntilDone();
+    intake.move_voltage(12000);
+    pros::delay(200);
+    clampPistons.set_value(false);
+    pros::delay(200);
+    intake.move_voltage(0);
+
+    // Quadrant 3
+
+    //move to center
+    chassis.moveToPoint(0, -48, 2000);
+    chassis.waitUntilDone();
+    //pick up ring
+    intake.move_voltage(-12000);
+    chassis.moveToPoint(27,-19,1000);//
+    chassis.waitUntilDone();
+    pros::delay(200);
+    intake.move_voltage(0);
+    //go to goal
+    chassis.turnToHeading(225,1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(50,4,1500,{.forwards=false});
+    chassis.waitUntilDone();
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(200);
+    intake.move_voltage(-12000);
+    //rings
+    chassis.moveToPoint(24,-48,1000);
+    chassis.waitUntilDone();
+    pros::delay(300);
+
+    chassis.moveToPoint(48,-44,1000);//
+    chassis.waitUntilDone();
+    pros::delay(300);
+    chassis.turnToHeading(180,1000);
+    chassis.waitUntilDone();
+
+    chassis.moveToPoint(48,-60,1000);
+    chassis.waitUntilDone();
+    pros::delay(300);
+    //corner
+    chassis.turnToHeading(300,1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(64,-64,1000,{.forwards=false});
+    chassis.waitUntilDone();
+    intake.move_voltage(12000);
+    pros::delay(100);
+    clampPistons.set_value(false);
+    pros::delay(300);
+    intake.move_voltage(0);
+
+    // Quadrant 4
+    chassis.moveToPoint(29,-23,1500);
+    chassis.waitUntilDone();
+    //goal
+    chassis.moveToPoint(60,24,1500,{.forwards=false});
+    chassis.waitUntilDone();
+    pros::delay(400);
+    clampPistons.set_value(true);
+    pros::delay(200);
+    //corner
+    chassis.moveToPoint(66,66,2000,{.forwards=false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(false);
+    pros::delay(200);
+    chassis.moveToPoint(53,46,2000);
 }

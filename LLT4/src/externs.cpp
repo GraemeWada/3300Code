@@ -8,7 +8,7 @@ pros::MotorGroup right_mg({1, -15, 16}, pros::MotorGearset::blue);
 pros::Motor intake(18, pros::MotorGearset::blue);
 pros::Motor ws(20, pros::MotorGearset::red);
 
-pros::Rotation wsr(3);
+pros::Rotation wsr(21);
 // pros::Rotation odomRot(-7);
 
 pros::Rotation verticalRota(-17);
@@ -16,6 +16,8 @@ pros::Rotation horizontalRota(-19);
 
 pros::ADIDigitalOut clampPistons ('H');
 pros::ADIDigitalOut boink ('G') ;
+
+pros::Optical color (9);
 //trackwidth 29cm = ~11.417in
 lemlib::Drivetrain drivetrain(&left_mg, &right_mg, 11.5, lemlib::Omniwheel::NEW_325, 450, 2);
 

@@ -17,7 +17,10 @@ rd::Selector selector({
     {"Blue+ S 6pt 2/3 1/4", &bluePositiveSafe2},
     {"Red- S 5pt 2/3 1/4", &redNegativeSafe},
     {"Red+ S 4pt 1/3 1/4", &redPositiveSafe},
-    {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2}
+    {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2},
+    {"Red Elims", &redElim},
+    {"Skills", &skills2},
+    {"skills Corners", &cornerSkills}
 });
 rd::Console console;
 
@@ -102,7 +105,7 @@ void autonomous() {
     // turn to face heading 90 with a very long timeout
     // blueNegtive();    // chassis.follow(path1_txt, 10, 4000);
     wsr.reset_position();
-    bluePositiveSafe2();
+    selector.run_auton();
 }
 
 //copied from lemlib
@@ -199,9 +202,12 @@ void liftPID(float desiredAngle, float kP, float kD, float settleError = 250){
     prevError = error;
     float angle = (wsr.get_angle() >= 35000) ? wsr.get_angle() - 36000 : wsr.get_angle();
     error = desiredAngle - angle;
-    pros::lcd::set_text(1, std::to_string(error));
-    pros::lcd::set_text(4, std::to_string(angle));
     
+    // pros::lcd::set_text(1, std::to_string(error));
+    // pros::lcd::set_text(4, std::to_string(angle));
+    std::cout << error;
+    std::cout << angle;
+
 
 
     derivative = error - prevError;
@@ -220,7 +226,7 @@ void liftPID(float desiredAngle, float kP, float kD, float settleError = 250){
     } else if( power < -12000){
         power = -12000;
     }
-    ws.move_voltage(power);
+    ws.move_voltage(-power);
 }
 
 /**
@@ -239,6 +245,51 @@ void liftPID(float desiredAngle, float kP, float kD, float settleError = 250){
 
 
 void opcontrol() {
+    pros::Task screenTask([&]() {
+        color.set_led_pwm(100);
+            while (true) {
+                int redMin = 9;
+                int redMax = 18;
+                int blueMin = 190;
+                int blueMax = 250;
+                bool blue =true;
+                while(true){
+                    if(controller.get_digital(DIGITAL_R1)){
+                        intake.move_voltage(-12000);
+                        if(!blue){
+                            if(color.get_hue()>blueMin&& color.get_hue()<blueMax){
+                                pros::delay(75);
+                                intake.move_voltage(12000);
+                                pros::delay(80);
+                                intake.move_voltage(-12000);
+                                console.print("saw blue");
+
+                            }
+                        }
+                        else{
+                            if(color.get_hue()>redMin&& color.get_hue()<redMax){
+                                pros::delay(75);
+                                intake.move_voltage(12000);
+                                pros::delay(80);
+                                intake.move_voltage(-12000);
+                                console.print("saw blue");
+
+                            }
+                        }
+
+                    } else if (controller.get_digital(DIGITAL_R2)){
+                        intake.move_voltage(12000);
+                    } else {
+                        intake.brake();
+                    }
+                    if(controller.get_digital_new_press(DIGITAL_DOWN)){
+                        blue = !blue;
+                    }
+
+                }
+                pros::delay(10);
+        }
+    });
     static float liftP = 3;
     static float liftD = 1;
     ws.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
@@ -246,8 +297,7 @@ void opcontrol() {
     bool clamp = false;
     bool boinked = false;
     intake.set_voltage_limit(12000);
-    ws.tare_position();
-    bool fast = false;
+    wsr.set_position(0);
     
     // controller
     // loop to continuously update motors
@@ -256,17 +306,9 @@ void opcontrol() {
             clamp = !clamp;
             clampPistons.set_value(clamp);
         }
-        if(controller.get_digital_new_press(DIGITAL_UP)){
+        if(controller.get_digital_new_press(DIGITAL_RIGHT)){
             boinked = !boinked;
             boink.set_value(boinked);
-        }
-
-        if(controller.get_digital(DIGITAL_R1)){
-            intake.move_voltage(-12000);
-        } else if (controller.get_digital(DIGITAL_R2)){
-            intake.move_voltage(12000);
-        } else {
-            intake.brake();
         }
 
         if(controller.get_digital_new_press(DIGITAL_L2)){
@@ -276,17 +318,17 @@ void opcontrol() {
             }
         }
         
-        // switch(i){
-        //         case 0:
-        //         liftPID(0, liftP, liftD);
-        //         break;
-        //         case 1:
-        //         liftPID(2600, liftP, liftD);
-        //         break;
-        //         case 2:
-        //         liftPID(14000, liftP, liftD);
-        //     }
-        //     pros::lcd::set_text(2, std::to_string(i));
+        switch(i){
+                case 0:
+                liftPID(0, liftP, liftD);
+                break;
+                case 1:
+                liftPID(2500, liftP, liftD);
+                break;
+                case 2:
+                liftPID(14500, liftP, liftD);
+            }
+            // pros::lcd::set_text(2, std::to_string(i));
 
         // get joystick positions
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
