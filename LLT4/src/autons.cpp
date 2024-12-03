@@ -58,6 +58,24 @@ void LiftPID(float desiredAngle, float kP, float kD, float settleError = 250){
     }
     ws.move_voltage(power);
 }
+ASSET(topLeftSkills_txt)
+void skillsPPtest(){
+    chassis.setPose(-60, 0, 90);
+    intake.move_voltage(-12000);
+    pros::delay(500);
+    intake.move_voltage(0);
+
+    chassis.moveToPoint(-50,20, 3000, {.forwards = false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(true);
+    pros::delay(300);
+
+    intake.move_voltage(-12000);
+    chassis.follow(topLeftSkills_txt, 10, 10000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-56,56,2000, {.forwards=false,.maxSpeed=60});
+
+}
 
 void blueNegtive2()
 {

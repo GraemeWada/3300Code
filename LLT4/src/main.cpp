@@ -21,6 +21,7 @@ rd::Selector selector({
     {"Red Elims", &redElim},
     {"Skills", &skills2},
     {"skills Corners", &cornerSkills}
+    {"Test Pure Pursuit Skills", &skillsPPtest}
 });
 rd::Console console;
 

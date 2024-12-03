@@ -10,3 +10,4 @@ extern void redElim();
 extern void skills1();
 extern void cornerSkills();
 extern void skills2();
+extern void skillsPPtest();
