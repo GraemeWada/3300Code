@@ -17,7 +17,8 @@ rd::Selector selector({
     {"Blue+ S 6pt 2/3 1/4", &bluePositiveSafe2},
     {"Red- S 5pt 2/3 1/4", &redNegativeSafe},
     {"Red+ S 4pt 1/3 1/4", &redPositiveSafe},
-    {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2}
+    {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2},
+    {"Test Pure Pursuit Skills", &skillsPPtest}
 });
 rd::Console console;
 
