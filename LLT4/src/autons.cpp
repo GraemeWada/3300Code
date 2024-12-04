@@ -144,17 +144,44 @@ void blueNegtive2()
 }
 void blueNegative6ring()
 {
-    chassis.setPose(63,19,223);
-    chassis.moveToPoint(63.136, 18.929, 5000);
-    chassis.moveToPoint(46.422, -0.038, 5000);
-    chassis.moveToPoint(22.385, 23.249, 5000);
-    chassis.moveToPoint(9.239, 50.666, 5000);
-    chassis.moveToPoint(19.192, 45.032, 5000);
-    chassis.moveToPoint(8.3, 43.342, 5000);
-    chassis.moveToPoint(28.019, 54.798, 5000);
-    chassis.moveToPoint(61.633, -54.873, 5000);
-    chassis.moveToPoint(60.131, -61.821, 5000);
-    chassis.moveToPoint(27.643, -5.671, 5000);
+    
+    chassis.setPose(54, 24, 90);
+    chassis.moveToPoint(23, 24, 5000, {.forwards = false});
+    chassis.waitUntil(24);
+    //clamp
+    clampPistons.set_value(true);
+    pros::delay(300);
+    intake.move_voltage(-12000);
+    //ring 1
+    chassis.moveToPoint(24, 47, 4000);
+    chassis.waitUntilDone();
+    
+    pros::delay(500);
+    chassis.moveToPoint(9, 43, 5000); //ring left
+    chassis.waitUntilDone();
+    pros::delay(700);
+    chassis.moveToPoint(-24, 47, 5000, {.forwards = false});
+    chassis.waitUntilDone();
+    chassis.moveToPoint(9,50,5000); //ring right
+    chassis.waitUntilDone();
+    //middle ring
+    chassis.moveToPoint(46, 0, 5000);
+    chassis.waitUntilDone();
+    //bottom pos ring
+    chassis.moveToPoint(63, -59, 5000);
+    chassis.waitUntilDone();
+    //pos corner sweep
+    chassis.moveToPoint(62, -54, 5000,{.forwards=false});
+    boink.set_value(true);
+    chassis.waitUntilDone();
+
+    chassis.turnToHeading(340,1000);
+    chassis.waitUntilDone();
+    boink.set_value(false);
+    clampPistons.set_value(false);
+    pros :: delay(200);
+    chassis.moveToPoint(28, -6, 5000);
+
 
 
 }
