@@ -343,7 +343,8 @@ void blueElimsWS(){
     chassis.moveToPoint(61,0,800);
     chassis.waitUntilDone();
     intake.move_voltage(-12000);
-
+    screenTask.remove();
+    wallStakeTask.remove();
     
 
 
