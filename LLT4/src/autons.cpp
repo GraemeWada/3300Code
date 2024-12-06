@@ -116,7 +116,49 @@ void blueNegtive2()
     clampPistons.set_value(false);
 
 }
+void blueNegative6ring()
+{
+    
+    chassis.setPose(54, 24, 90);
+    chassis.moveToPoint(23, 24, 5000, {.forwards = false});
+    chassis.waitUntil(24);
+    //clamp
+    clampPistons.set_value(true);
+    pros::delay(300);
+    intake.move_voltage(-12000);
+    //ring 1
+    chassis.moveToPoint(24, 47, 4000);
+    chassis.waitUntilDone();
+    
+    pros::delay(500);
+    chassis.moveToPoint(9, 43, 5000); //ring left
+    chassis.waitUntilDone();
+    pros::delay(700);
+    chassis.moveToPoint(-24, 47, 5000, {.forwards = false});
+    chassis.waitUntilDone();
+    chassis.moveToPoint(9,50,5000); //ring right
+    chassis.waitUntilDone();
+    //middle ring
+    chassis.moveToPoint(46, 0, 5000);
+    chassis.waitUntilDone();
+    //bottom pos ring
+    chassis.moveToPoint(63, -59, 5000);
+    chassis.waitUntilDone();
+    //pos corner sweep
+    chassis.moveToPoint(62, -54, 5000,{.forwards=false});
+    boink.set_value(true);
+    chassis.waitUntilDone();
 
+    chassis.turnToHeading(340,1000);
+    chassis.waitUntilDone();
+    boink.set_value(false);
+    clampPistons.set_value(false);
+    pros :: delay(200);
+    chassis.moveToPoint(28, -6, 5000);
+
+
+
+}
 
 
 /**************************************/

@@ -13,6 +13,7 @@ rd::Selector selector({
     //#/3 indicates number of local WP tasks
     //#/4 indicates number of sig WP tasks
     {"Blue- S 5pt 2/3 1/4", &blueNegativeSafe},
+    {"Blue- S 8pt 2/3 unknown", &blueNegative6ring},
     {"Blue+ S 4pt 1/3 1/4", &bluePositiveSafe},
     {"Blue+ S 6pt 2/3 1/4", &bluePositiveSafe2},
     {"Red- S 5pt 2/3 1/4", &redNegativeSafe},
