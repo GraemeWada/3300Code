@@ -1,4 +1,6 @@
 #include "main.h"
+#include <atomic>
+
 #include "lemlib/api.hpp"
 
 
@@ -58,24 +60,7 @@ void LiftPID(float desiredAngle, float kP, float kD, float settleError = 250){
     }
     ws.move_voltage(power);
 }
-ASSET(topLeftSkills_txt)
-void skillsPPtest(){
-    chassis.setPose(-60, 0, 90);
-    intake.move_voltage(-12000);
-    pros::delay(500);
-    intake.move_voltage(0);
 
-    chassis.moveToPoint(-50,20, 3000, {.forwards = false});
-    chassis.waitUntilDone();
-    clampPistons.set_value(true);
-    pros::delay(300);
-
-    intake.move_voltage(-12000);
-    chassis.follow(topLeftSkills_txt, 10, 10000);
-    chassis.waitUntilDone();
-    chassis.moveToPoint(-56,56,2000, {.forwards=false,.maxSpeed=60});
-
-}
 
 void blueNegtive2()
 {
@@ -130,17 +115,6 @@ void blueNegtive2()
     chassis.waitUntilDone();
     clampPistons.set_value(false);
 
-
-
-
-
- 
-    
-
-
-
-
-
 }
 
 
@@ -185,6 +159,7 @@ void blueNegativeSafe(){
     chassis.moveToPoint(24,3,5000,{.maxSpeed=50});
 }
 
+
 void bluePositiveSafe(){
     chassis.setPose(54, -24, 90);
     chassis.moveToPoint(24, -24, 5000, {.forwards=false, .maxSpeed=70});
@@ -228,6 +203,110 @@ void bluePositiveSafe2(){
     pros::delay(1000);
     intake.move_voltage(0);
     chassis.moveToPoint(24,5,5000, {.maxSpeed = 50});
+}
+
+void blueElimsWS(){
+    pros::Task screenTask([&]() {
+        color.set_led_pwm(100);
+            while (true) {
+                int redMin = 9;
+                int redMax = 18;
+                int blueMin = 190;
+                int blueMax = 250;
+                bool blue =true;
+            
+                if(!blue){
+                    if(color.get_hue()>blueMin&& color.get_hue()<blueMax){
+                        pros::delay(60);
+                        intake.move_voltage(12000);
+                        pros::delay(80);
+                        intake.move_voltage(-12000);
+
+                    }
+                }
+                else{
+                    if(color.get_hue()>redMin&& color.get_hue()<redMax){
+                        pros::delay(60);
+                        intake.move_voltage(12000);
+                        pros::delay(80);
+                        intake.move_voltage(-12000);
+
+                    }
+                }
+
+                
+            pros::delay(10);
+        }
+    });
+    std::atomic<int> i(0);
+    pros::Task wallStakeTask([&]{
+        static float liftP = 3;
+        static float liftD = 1;
+        switch(i.load()){
+                case 0:
+                LiftPID(0, liftP, liftD);
+                break;
+                case 1:
+                LiftPID(2500, liftP, liftD);
+                break;
+                case 2:
+                LiftPID(12000, liftP, liftD);
+                case 3:
+                LiftPID(14500, liftP, liftD);
+            }
+    });
+    chassis.setPose(54, 23.5, 90 );
+
+    chassis.moveToPoint(30, 23.5, 3000, {.forwards = false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(true);
+    pros::delay(200);
+
+    chassis.moveToPose(7.5, 38,340, 3000, {.maxSpeed=90});
+    intake.move_voltage(-12000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+    intake.move_voltage(0);
+
+    chassis.moveToPoint(22,45.5,2000, {.minSpeed=60,.earlyExitRange = 5.5});
+    intake.move_voltage(-12000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+    intake.move_voltage(0);
+
+    chassis.moveToPoint(8.5,50,2000, {.maxSpeed=100, .minSpeed = 45, .earlyExitRange = 5});
+    intake.move_voltage(-12000);
+    chassis.waitUntilDone();
+    pros::delay(200);
+    i=1;
+    chassis.moveToPose(6.4,60,330, 3000,{.maxSpeed= 85});
+    i=2;
+    chassis.waitUntilDone();
+    intake.move_voltage(4000);
+    pros::delay(70);
+    i=3;
+    intake.move_voltage(0);    
+    pros::delay(500);
+    i=0;
+    chassis.turnToPoint(0,48,1000, {.minSpeed=40, .earlyExitRange=30});
+    chassis.moveToPose(47,0,180,6000);
+    chassis.waitUntil(45);
+    intake.move_voltage(-12000);
+    chassis.moveToPoint(47,10,750, {.minSpeed = 70, .earlyExitRange=4});
+    chassis.moveToPoint(47,-10,1000);
+    chassis.waitUntilDone();
+    intake.move_voltage(0);
+    chassis.moveToPose(57,0,0, 1000, {.minSpeed=75});
+    chassis.turnToHeading(270, 800);
+    chassis.moveToPoint(61,0,800);
+    chassis.waitUntilDone();
+    intake.move_voltage(-12000);
+
+    
+
+
+
+
 }
 
 /**************************************/
@@ -722,4 +801,24 @@ void skills2(){
     clampPistons.set_value(false);
     pros::delay(200);
     chassis.moveToPoint(53,46,2000);
+}
+
+
+ASSET(topLeftSkills_txt)
+void skillsPPtest(){
+    chassis.setPose(-60, 0, 90);
+    intake.move_voltage(-12000);
+    pros::delay(500);
+    intake.move_voltage(0);
+
+    chassis.moveToPoint(-50,20, 3000, {.forwards = false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(true);
+    pros::delay(300);
+
+    intake.move_voltage(-12000);
+    chassis.follow(topLeftSkills_txt, 10, 10000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-56,56,2000, {.forwards=false,.maxSpeed=60});
+
 }
