@@ -12,7 +12,7 @@ pros::Rotation wsr(21);
 // pros::Rotation odomRot(-7);
 
 pros::Rotation verticalRota(-17);
-pros::Rotation horizontalRota(-19);
+pros::Rotation horizontalRota(19);
 
 pros::ADIDigitalOut clampPistons ('H');
 pros::ADIDigitalOut boink ('G') ;
@@ -32,9 +32,9 @@ pros::Imu imu(14);
 lemlib::TrackingWheel htw(&horizontalRota, lemlib::Omniwheel::NEW_275, -3); // third value is tracking center offset
 lemlib::TrackingWheel vtw(&verticalRota, lemlib::Omniwheel::NEW_2, -0.25);
 
-lemlib::OdomSensors sensors(&vtw, // vertical tracking wheel 1, set to null
+lemlib::OdomSensors sensors(&vtw, // vsertical tracking wheel 1, set to null
                             nullptr, // vertical tracking wheel 2, set to nullptr as we are using IMEs
-                            nullptr, // horizontal tracking wheel 1
+                            &htw, // horizontal tracking wheel 1
                             nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
                             &imu // inertial sensor
 );
@@ -51,16 +51,16 @@ lemlib::ControllerSettings lateral_controller(4.4, // proportional gain (kP)
                                               0, // integral gain (kI)
                                               3.75, // derivative gain (kD)
                                               0, // anti windup
-                                              2, // small error range, in inches
-                                              300, // small error range timeout, in milliseconds
-                                              5, // large error range, in inches
-                                              750, // large error range timeout, in milliseconds
+                                              0, // small error range, in inches
+                                              0, // small error range timeout, in milliseconds
+                                              0, // large error range, in inches
+                                              0, // large error range timeout, in milliseconds
                                               0 // maximum acceleration (slew)
 );
 
 // angular PID controller
 lemlib::ControllerSettings angular_controller(3, // proportional gain (kP)
-                                              0.00, // integral gain (kI)
+                                              0.01, // integral gain (kI)
                                               15.25, // derivative gain (kD)
                                               0, // anti windup
                                               0, // small error range, in degrees

@@ -248,9 +248,31 @@ void bluePositiveSafe2(){
 }
 
 void blueElimsWS(){
+
+    std::atomic<int> i(0);
+
     pros::Task screenTask([&]() {
         color.set_led_pwm(100);
             while (true) {
+                                
+                            
+            static float liftP = 3;
+                    static float liftD = 1;
+                    while(true){
+                    switch(i){
+                            case 0:
+                            LiftPID(0, liftP, liftD);
+                            break;
+                            case 1:
+                            LiftPID(2500, liftP, liftD);
+                            break;
+                            case 2:
+                            LiftPID(12000, liftP, liftD);
+                            case 3:
+                            LiftPID(14500, liftP, liftD);
+                            pros::delay(20);
+                        }
+                    }
                 int redMin = 9;
                 int redMax = 18;
                 int blueMin = 190;
@@ -280,23 +302,8 @@ void blueElimsWS(){
             pros::delay(10);
         }
     });
-    std::atomic<int> i(0);
-    pros::Task wallStakeTask([&]{
-        static float liftP = 3;
-        static float liftD = 1;
-        switch(i.load()){
-                case 0:
-                LiftPID(0, liftP, liftD);
-                break;
-                case 1:
-                LiftPID(2500, liftP, liftD);
-                break;
-                case 2:
-                LiftPID(12000, liftP, liftD);
-                case 3:
-                LiftPID(14500, liftP, liftD);
-            }
-    });
+   
+
     chassis.setPose(54, 23.5, 90 );
 
     chassis.moveToPoint(30, 23.5, 3000, {.forwards = false});
@@ -304,7 +311,7 @@ void blueElimsWS(){
     clampPistons.set_value(true);
     pros::delay(200);
 
-    chassis.moveToPose(7.5, 38,340, 3000, {.maxSpeed=90});
+    chassis.moveToPoint(7.5, 38, 3000, {.maxSpeed=90});
     intake.move_voltage(-12000);
     chassis.waitUntilDone();
     pros::delay(200);
@@ -334,8 +341,9 @@ void blueElimsWS(){
     chassis.moveToPose(47,0,180,6000);
     chassis.waitUntil(45);
     intake.move_voltage(-12000);
-    chassis.moveToPoint(47,10,750, {.minSpeed = 70, .earlyExitRange=4});
+    chassis.moveToPoint(47,10,750, {.forwards=false,.minSpeed = 70, .earlyExitRange=4});
     chassis.moveToPoint(47,-10,1000);
+    clampPistons.set_value(false);
     chassis.waitUntilDone();
     intake.move_voltage(0);
     chassis.moveToPose(57,0,0, 1000, {.minSpeed=75});
@@ -344,7 +352,6 @@ void blueElimsWS(){
     chassis.waitUntilDone();
     intake.move_voltage(-12000);
     screenTask.remove();
-    wallStakeTask.remove();
     
 
 
@@ -863,5 +870,18 @@ void skillsPPtest(){
     chassis.follow(topLeftSkills_txt, 10, 10000);
     chassis.waitUntilDone();
     chassis.moveToPoint(-56,56,2000, {.forwards=false,.maxSpeed=60});
+
+}
+
+
+
+void test (){
+    chassis.setPose(-59, 0, 90);
+    chassis.moveToPoint(-32,0,1000);
+    chassis.moveToPoint(-59, 0, 1000);
+    intake.move_voltage(-12000);
+    pros::delay(500);
+    intake.move_voltage(0);
+
 
 }

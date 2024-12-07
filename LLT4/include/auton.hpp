@@ -12,3 +12,6 @@ extern void skills1();
 extern void cornerSkills();
 extern void skills2();
 extern void skillsPPtest();
+extern void  blueElimsWS();
+
+extern void test();

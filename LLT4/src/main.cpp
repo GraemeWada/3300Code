@@ -6,25 +6,25 @@
 //github 
 //https://github.com/unwieldycat/robodash/blob/main/src/main.cpp
 
-rd::Selector selector({
-    //Blue or Red indicates team, + or - indicates corner side
-    //S or R indicates safe or rush
-    //#pt indicates points
-    //#/3 indicates number of local WP tasks
-    //#/4 indicates number of sig WP tasks
-    {"Blue- S 5pt 2/3 1/4", &blueNegativeSafe},
-    {"Blue- S 8pt 2/3 unknown", &blueNegative6ring},
-    {"Blue+ S 4pt 1/3 1/4", &bluePositiveSafe},
-    {"Blue+ S 6pt 2/3 1/4", &bluePositiveSafe2},
-    {"Red- S 5pt 2/3 1/4", &redNegativeSafe},
-    {"Red+ S 4pt 1/3 1/4", &redPositiveSafe},
-    {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2},
-    {"Red Elims", &redElim},
-    {"Skills", &skills2},
-    {"skills Corners", &cornerSkills},
-    {"Test Pure Pursuit Skills", &skillsPPtest}
-});
-rd::Console console;
+// rd::Selector selector({
+//     //Blue or Red indicates team, + or - indicates corner side
+//     //S or R indicates safe or rush
+//     //#pt indicates points
+//     //#/3 indicates number of local WP tasks
+//     //#/4 indicates number of sig WP tasks
+//     {"Blue- S 5pt 2/3 1/4", &blueNegativeSafe},
+//     {"Blue- S 8pt 2/3 unknown", &blueNegative6ring},
+//     {"Blue+ S 4pt 1/3 1/4", &bluePositiveSafe},
+//     {"Blue+ S 6pt 2/3 1/4", &bluePositiveSafe2},
+//     {"Red- S 5pt 2/3 1/4", &redNegativeSafe},
+//     {"Red+ S 4pt 1/3 1/4", &redPositiveSafe},
+//     {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2},
+//     {"Red Elims", &redElim},
+//     {"Skills", &skills2},
+//     {"skills Corners", &cornerSkills},
+//     {"Test Pure Pursuit Skills", &skillsPPtest}
+// });
+// rd::Console console;
 
 
 /**
@@ -50,26 +50,23 @@ void on_center_button() {
  */
 void initialize() {
     chassis.calibrate();
+    pros::lcd::initialize();
 
-    selector.focus();
+    // selector.focus();
 
-    // pros::Task screenTask([&]() {
-    //     while (true) {
-    //         // print robot location to the brain screen
-    //         pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-    //         pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-    //         pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-    //         // log position telemetry
-    //         lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
-    //         // delay to save resources
-    //         pros::delay(50);
-    // }
-    // });
-	// while (true){
-    //     pros::lcd::print(1, "Rotation Sensor H: %i", verticalRota.get_position());
-	// 	pros::lcd::print(0, "Rotation Sensor V: %i", horizontalRota.get_position());
-    //     pros::delay(10); // delay to save resources. DO NOT REMOVE
-	// }
+    pros::Task ScreenTask([&]() {
+        while (true) {
+            // print robot location to the brain screen
+            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            // log position telemetry
+            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+            // delay to save resources
+            pros::delay(50);
+    }
+    });
+	
     
 }
 
@@ -107,7 +104,10 @@ void autonomous() {
     // turn to face heading 90 with a very long timeout
     // blueNegtive();    // chassis.follow(path1_txt, 10, 4000);
     wsr.reset_position();
-    selector.run_auton();
+     skills2();
+
+    // selector.run_auton();
+
 }
 
 //copied from lemlib
@@ -145,6 +145,7 @@ void antiTipDrive(int left, int right, double changeRate, int maxChange, float d
     static int prevRightPower = 0;
     float leftC = driveCurve(left, deadband, minOutput,Lcurve);
     float rightC= driveCurve(right, deadband, minOutput,Rcurve);
+    leftC = (rightC ==0)?leftC: leftC*.60;
 
     float leftPower = ( leftC + rightC) * 12000 / 127;
     float rightPower = (rightC - leftC) * 12000 / 127;
@@ -264,7 +265,7 @@ void opcontrol() {
                                 intake.move_voltage(12000);
                                 pros::delay(80);
                                 intake.move_voltage(-12000);
-                                console.print("saw blue");
+                                // console.print("saw blue");
 
                             }
                         }
@@ -274,7 +275,7 @@ void opcontrol() {
                                 intake.move_voltage(12000);
                                 pros::delay(80);
                                 intake.move_voltage(-12000);
-                                console.print("saw blue");
+                                // console.print("saw blue");
 
                             }
                         }
