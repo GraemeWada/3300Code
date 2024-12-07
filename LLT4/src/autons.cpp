@@ -58,7 +58,7 @@ void LiftPID(float desiredAngle, float kP, float kD, float settleError = 250){
     } else if( power < -12000){
         power = -12000;
     }
-    ws.move_voltage(power);
+    ws.move_voltage(-power);
 }
 
 
