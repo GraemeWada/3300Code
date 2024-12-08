@@ -253,12 +253,16 @@ void blueElimsWS(){
 
     pros::Task screenTask([&]() {
         color.set_led_pwm(100);
+           int redMin = 9;
+                int redMax = 18;
+                int blueMin = 190;
+                int blueMax = 250;
+                bool blue =true;      
             while (true) {
-                                
+         
                             
             static float liftP = 3;
                     static float liftD = 1;
-                    while(true){
                     switch(i){
                             case 0:
                             LiftPID(0, liftP, liftD);
@@ -272,12 +276,8 @@ void blueElimsWS(){
                             LiftPID(14500, liftP, liftD);
                             pros::delay(20);
                         }
-                    }
-                int redMin = 9;
-                int redMax = 18;
-                int blueMin = 190;
-                int blueMax = 250;
-                bool blue =true;
+                    
+                
             
                 if(!blue){
                     if(color.get_hue()>blueMin&& color.get_hue()<blueMax){
@@ -352,10 +352,61 @@ void blueElimsWS(){
     chassis.waitUntilDone();
     intake.move_voltage(-12000);
     screenTask.remove();
+};
+void intakeUntilBlue(){
+            color.set_led_pwm(100);
+            int redMin = 9;
+            int redMax = 18;
+            int blueMin = 190;
+            int blueMax = 250;
+            bool blue =true;      
+                
+            while (!(color.get_hue()>blueMin&& color.get_hue()<blueMax)) {
+                intake.move_voltage(-12000);
+                pros::delay(10);
+            }
+}
+
+void blueFullSoloAWP(){
+    chassis.setPose(53.5,31,180);
+
+    chassis.moveToPoint(54,40,2000,{.forwards = false, .maxSpeed = 75});//push alliance off the line
+    
+    //score alliacne stake with preload
+    chassis.moveToPoint(53.5,0,2000);
+    chassis.turnToHeading(270,1500,{.maxSpeed=85});
+    chassis.moveToPoint(62,0,1500);
+    intake.move_voltage(-12000);
+    pros::delay(400);
+    intake.move_voltage(0);
+    //get the goal
+    chassis.moveToPoint(40,0,1500);
+    chassis.moveToPoint(23.5,23.5,1500,{.forwards =false});
+    clampPistons.set_value(true);
+    pros::delay(200);
+
+    //score rings from stack on our side
+    chassis.moveToPoint(23.5,47,2000);
+    intake.move_voltage(-12000);
+
+    //score rings from stack in middle
+    chassis.moveToPoint(9, 43, 2000, {.maxSpeed=65});
+    pros::delay(500);
+    chassis.moveToPoint(17,47,1500,{.forwards=false,.maxSpeed=60});
+
+    chassis.moveToPoint(9,50,2000,{.maxSpeed=65});
+    pros::delay(500);
+    //touch ladder
+    chassis.moveToPoint(16,11,2000,{.maxSpeed=65});
+
+
+
+
+
     
 
 
-
+   
 
 }
 
