@@ -175,18 +175,18 @@ void blueNegative6ring()
 
 void blueNegativeSafe(){
     chassis.setPose(54, 24, 90);
-    chassis.moveToPoint(23, 24, 5000, {.forwards = false});
+    chassis.moveToPoint(23, 24, 2000, {.forwards = false});
     chassis.waitUntil(24);
     clampPistons.set_value(true);
     pros::delay(500);
     intake.move_voltage(-12000);
     pros::delay(500);
     // intake.move_voltage(12000);
-    chassis.moveToPoint(24, 47, 5000);
+    chassis.moveToPoint(24, 47, 2000);
     chassis.waitUntilDone();
     // intake.move_voltage(-12000);
     pros::delay(500);
-    chassis.moveToPoint(9, 43, 5000);
+    chassis.moveToPoint(9, 43, 2000);
     chassis.waitUntilDone();
     pros::delay(700);
     // intake.move_voltage(0);
@@ -194,7 +194,7 @@ void blueNegativeSafe(){
     // chassis.waitUntilDone();
     // intake.move_voltage(-12000);
     // clampPistons.set_value(false);
-    chassis.moveToPoint(24, 47, 5000, {.forwards = false});
+    chassis.moveToPoint(24, 47, 2000, {.forwards = false});
     chassis.waitUntilDone();
     // intake.move_voltage(0);
     chassis.moveToPoint(9, 50, 5000);
