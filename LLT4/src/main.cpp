@@ -21,7 +21,6 @@
 //     {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2},
 //     {"Red Elims", &redElim},
 //     {"Skills", &skills2},
-//     {"skills Corners", &cornerSkills},
 //     {"Test Pure Pursuit Skills", &skillsPPtest}
 // });
 // rd::Console console;
