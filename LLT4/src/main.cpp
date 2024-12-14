@@ -325,7 +325,7 @@ void opcontrol() {
                 liftPID(0, liftP, liftD);
                 break;
                 case 1:
-                liftPID(2500, liftP, liftD);
+                liftPID(3000, liftP, liftD);
                 break;
                 case 2:
                 liftPID(14500, liftP, liftD);

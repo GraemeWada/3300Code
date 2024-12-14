@@ -370,18 +370,21 @@ void intakeUntilBlue(){
 void blueFullSoloAWP(){
     chassis.setPose(53.5,31,180);
 
-    chassis.moveToPoint(54,40,2000,{.forwards = false, .maxSpeed = 75});//push alliance off the line
+    chassis.moveToPoint(52,38,2000,{.forwards = false, .maxSpeed = 75});//push alliance off the line
     
     //score alliacne stake with preload
-    chassis.moveToPoint(53.5,0,2000);
+    chassis.moveToPoint(52,-1,2000);
     chassis.turnToHeading(270,1500,{.maxSpeed=85});
-    chassis.moveToPoint(62,0,1500);
+    chassis.moveToPoint(62,-1,1500);
     intake.move_voltage(-12000);
     pros::delay(400);
     intake.move_voltage(0);
     //get the goal
+
     chassis.moveToPoint(40,0,1500);
+    chassis.waitUntilDone();
     chassis.moveToPoint(23.5,23.5,1500,{.forwards =false});
+    chassis.waitUntilDone();
     clampPistons.set_value(true);
     pros::delay(200);
 
@@ -390,14 +393,14 @@ void blueFullSoloAWP(){
     intake.move_voltage(-12000);
 
     //score rings from stack in middle
-    chassis.moveToPoint(9, 43, 2000, {.maxSpeed=65});
+    chassis.moveToPoint(9, 43, 1000, {.maxSpeed=80});
     pros::delay(500);
-    chassis.moveToPoint(17,47,1500,{.forwards=false,.maxSpeed=60});
+    chassis.moveToPoint(17,47,1500,{.forwards=false});
 
-    chassis.moveToPoint(9,50,2000,{.maxSpeed=65});
+    chassis.moveToPoint(9,50,2000,{.maxSpeed=80});
     pros::delay(500);
     //touch ladder
-    chassis.moveToPoint(16,11,2000,{.maxSpeed=65});
+    chassis.moveToPoint(16,11,2000);
 
 
 
