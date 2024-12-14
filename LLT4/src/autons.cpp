@@ -154,14 +154,15 @@ void blueNegative6ring()
     //middle ring
     chassis.moveToPoint(46, 0, 3000);
     chassis.waitUntilDone();
+    //pos corner sweep
+    chassis.moveToPoint(62, -54, 500);
+    boink.set_value(true);
+    chassis.waitUntilDone();
     //bottom pos ring
     chassis.moveToPoint(63, -59, 2000);
     chassis.waitUntilDone();
-    //pos corner sweep
+    // drop mogoal
     chassis.moveToPoint(62, -54, 500,{.forwards=false});
-    boink.set_value(true);
-    chassis.waitUntilDone();
-
     chassis.turnToHeading(340,1000);
     chassis.waitUntilDone();
     boink.set_value(false);
