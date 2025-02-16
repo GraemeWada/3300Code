@@ -7,8 +7,8 @@
 #include <cmath>
 
 const double MM_TO_INCH = 0.0393701;
-const int NUM_PARTICLES = 1000;
-const double SENSOR_NOISE = 30.0; // Adjust noise level as needed
+const int NUM_PARTICLES = 100;
+const double SENSOR_NOISE = 15.0; // Adjust noise level as needed
 const double THRESHOLD_DISTANCE = 2; //distance before MCL position is accepted
 const double GRID_SIZE = 140.0;
 
@@ -38,7 +38,7 @@ public:
 
     void initializeParticles() {
         std::uniform_real_distribution<double> dist(-GRID_SIZE / 2, GRID_SIZE / 2);
-        std::uniform_real_distribution<double> angle_dist(0, 2 * M_PI);
+        std::uniform_real_distribution<double> angle_dist(0, 360);
         
         particles.clear();
         for (int i = 0; i < NUM_PARTICLES; ++i) {
@@ -57,12 +57,13 @@ public:
         double sensor_x = pose.x + rotated_x_offset;
         double sensor_y = pose.y + rotated_y_offset;
     
-        return computePQ(sensor_x, sensor_y, theta_rad + sensor.theta_offset, GRID_SIZE);
+        return computePQ(sensor_x*25.4, sensor_y*25.4, theta_rad + (sensor.theta_offset *(M_PI/180)), GRID_SIZE * 25.4);
         // Compute distance to nearest boundary of the grid
         // return std::min({fabs(sensor_x - (-GRID_SIZE / 2)), fabs(sensor_x - (GRID_SIZE / 2)),
         //                  fabs(sensor_y - (-GRID_SIZE / 2)), fabs(sensor_y - (GRID_SIZE / 2))});
     }
     
+    //computes line PQ, which is distance from distance sensor to wall
     double computePQ(double p_x, double p_y, double theta, double L) {
         // Calculate the direction components of the ray (cos(theta), sin(theta))
         double cos_theta = cos(theta);
@@ -76,8 +77,10 @@ public:
         if (cos_theta != 0) {
             if (cos_theta > 0) {
                 t_x = (L / 2.0 - p_x) / cos_theta;  // Right side
+                std::cout <<"right ";
             } else {
                 t_x = (-L / 2.0 - p_x) / cos_theta; // Left side
+                std::cout <<"left ";
             }
         }
         
@@ -85,8 +88,10 @@ public:
         if (sin_theta != 0) {
             if (sin_theta > 0) {
                 t_y = (L / 2.0 - p_y) / sin_theta;  // Top side
+                std::cout <<"top ";
             } else {
                 t_y = (-L / 2.0 - p_y) / sin_theta; // Bottom side
+                std::cout <<"bottom ";
             }
         }
         
@@ -101,21 +106,25 @@ public:
             double front_expected = expectedSensorReading(p.pose, sensors[0]) * MM_TO_INCH;
             double left_expected = expectedSensorReading(p.pose, sensors[1]) * MM_TO_INCH;
             double right_expected = expectedSensorReading(p.pose, sensors[2]) * MM_TO_INCH;
-
+            //takes gaussian probability, might need to be changed
             double front_prob = exp(-pow(front - front_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE));
             double left_prob = exp(-pow(left - left_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE));
             double right_prob = exp(-pow(right - right_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE));
             
             p.weight = front_prob * left_prob * right_prob;
             sum_weights += p.weight;
-            std::cout << std::to_string(p.weight) + " "+std::to_string(front_prob)+ " " + std::to_string(left_prob) + " " + std::to_string(right_prob) + " " 
-            + std::to_string(front_expected) + " " + std::to_string(left_expected) + " " + std::to_string(right_expected) + "\n";
+            
+            std::cout << "prob: " + std::to_string(front_prob)+ " " + std::to_string(left_prob) + " " + std::to_string(right_prob) + " " 
+            + "expect: " + std::to_string(front_expected) + " " + std::to_string(left_expected) + " " + std::to_string(right_expected)
+            + " read: " + std::to_string(front) + " " + std::to_string(left) + " " + std::to_string(right) + "\n";
         }
 
         if (sum_weights == 0) sum_weights = 1e-6;
         
         for (auto& p : particles) {
             p.weight /= sum_weights;
+            std::cout << "weight" + std::to_string(p.weight) + "\n";
+            std::cout << std::to_string(p.pose.x) + " " + std::to_string(p.pose.y) + " " + std::to_string(p.pose.theta) + "\n";
         }
     }
 
@@ -140,10 +149,11 @@ public:
     }
     
     Pose getEstimatedPose() {
-        double x_sum = 0.0, y_sum = 0.0;
+        double x_sum = 0.0, y_sum = 0.0, theta_sum = 0.0;
         for (const auto& p : particles) {
             x_sum += p.pose.x * p.weight;
             y_sum += p.pose.y * p.weight;
+            theta_sum += p.pose.theta * p.weight;
             // pros::lcd::set_text(4, std::to_string(p.pose.x));
             // pros::lcd::set_text(5, std::to_string(p.pose.y));
             // pros::lcd::set_text(6, std::to_string(p.pose.theta));
@@ -191,14 +201,14 @@ int main() {
 }
 
 void testMCL(){
-    chassis.setPose(-60, 0, 90);
+    chassis.setPose(-60, -60, 225);
 
     MonteCarloLocalization mcl;
     
     Sensor sensors[3] = {
         {4.5, 6.5, 0}, // Front sensor offset (in inches)
-        {-5.9, 3.125, -90}, // Left sensor offset
-        {5.9, 3.125, 90} // Right sensor offset
+        {-5.9, 3.125, 90}, // Left sensor offset
+        {5.9, 3.125, -90} // Right sensor offset
     };
     while(true){
         double frontReading = upSensor.get();
@@ -214,10 +224,11 @@ void testMCL(){
         Pose estimatedPose = mcl.getEstimatedPose();
         pros::lcd::set_text(5, std::to_string(estimatedPose.x));
         pros::lcd::set_text(6, std::to_string(estimatedPose.y));
+        pros::lcd::set_text(7, std::to_string(estimatedPose.theta));
 
         if(compareEstimateToOdom(mcl) < THRESHOLD_DISTANCE){
             chassis.setPose(estimatedPose.x, estimatedPose.y, estimatedPose.theta);
         }
-        pros::delay(50);
+        pros::delay(1000);
     }
 }
