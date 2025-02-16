@@ -6,10 +6,15 @@
 #include <random>
 #include <cmath>
 
-const double MM_TO_INCH = 0.0393701;
-const int NUM_PARTICLES = 100;
-const double SENSOR_NOISE = 15.0; // Adjust noise level as needed
+//TUNE THESE
+const double SENSOR_NOISE = 10.0; // Adjust noise level as needed
 const double THRESHOLD_DISTANCE = 2; //distance before MCL position is accepted
+const int NUM_PARTICLES = 1000; //adjust number of particles
+const double POSITION_VARIATION = 3; //maximum variation in position when resampling
+const double ANGLE_VARIATION = 8; //maximum variation in theta when resampling
+const float ACCEPTANCE_PERCENT = 0.125; //percent of highest weighted particles to accept for resampling
+
+const double MM_TO_INCH = 0.0393701;
 const double GRID_SIZE = 140.0;
 
 struct Pose {
@@ -30,6 +35,7 @@ private:
     std::vector<Particle> particles;
     std::default_random_engine generator;
     std::normal_distribution<double> noise_dist;
+    Pose lastPose;
 
 public:
     MonteCarloLocalization() : noise_dist(0.0, SENSOR_NOISE) {
@@ -39,6 +45,8 @@ public:
     void initializeParticles() {
         std::uniform_real_distribution<double> dist(-GRID_SIZE / 2, GRID_SIZE / 2);
         std::uniform_real_distribution<double> angle_dist(0, 360);
+
+        lastPose = {chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta};
         
         particles.clear();
         for (int i = 0; i < NUM_PARTICLES; ++i) {
@@ -103,6 +111,15 @@ public:
     void updateWeights(double front, double left, double right, const Pose& robotPose, const Sensor sensors[3]) {
         double sum_weights = 0.0;
         for (auto& p : particles) {
+            //update pose of all particles based on dead reckoning
+            double deltaX = robotPose.x - lastPose.x;
+            double deltaY = robotPose.y - lastPose.y;
+            double deltaTheta = robotPose.theta - lastPose.theta;
+
+            p.pose.x += deltaX;
+            p.pose.y += deltaY;
+            p.pose.theta += deltaTheta;
+
             double front_expected = expectedSensorReading(p.pose, sensors[0]) * MM_TO_INCH;
             double left_expected = expectedSensorReading(p.pose, sensors[1]) * MM_TO_INCH;
             double right_expected = expectedSensorReading(p.pose, sensors[2]) * MM_TO_INCH;
@@ -130,21 +147,24 @@ public:
 
     void resampleParticles() {
         std::vector<Particle> new_particles;
-        std::uniform_real_distribution<double> dist(0.0, 1.0);
-        double beta = 0.0;
-        double max_weight = 0.0;
-        for (const auto& p : particles) {
-            if (p.weight > max_weight) max_weight = p.weight;
-        }
-        int index = rand() % NUM_PARTICLES;
+        std::sort(particles.begin(), particles.end(), [](const Particle& a, const Particle& b) {
+            return a.weight > b.weight;
+        });
+        
+        int top_count = NUM_PARTICLES * ACCEPTANCE_PERCENT;
+        std::normal_distribution<double> pos_dist(-POSITION_VARIATION, POSITION_VARIATION);
+        std::normal_distribution<double> angle_dist(-ANGLE_VARIATION, ANGLE_VARIATION);
+        
         for (int i = 0; i < NUM_PARTICLES; ++i) {
-            beta += dist(generator) * 2.0 * max_weight;
-            while (beta > particles[index].weight) {
-                beta -= particles[index].weight;
-                index = (index + 1) % NUM_PARTICLES;
-            }
-            new_particles.push_back(particles[index]);
+            const Particle& parent = particles[i % top_count];
+            Particle new_particle;
+            new_particle.pose.x = parent.pose.x + pos_dist(generator);
+            new_particle.pose.y = parent.pose.y + pos_dist(generator);
+            new_particle.pose.theta = parent.pose.theta + angle_dist(generator);
+            new_particle.weight = 1.0 / NUM_PARTICLES;
+            new_particles.push_back(new_particle);
         }
+        
         particles = new_particles;
     }
     
@@ -160,7 +180,7 @@ public:
         }
         // pros::lcd::set_text(4, std::to_string(x_sum));
         // pros::lcd::set_text(5, std::to_string(y_sum));
-        return {x_sum, y_sum, chassis.getPose().theta};
+        return {x_sum, y_sum, theta_sum};
     }
 
     
@@ -229,6 +249,6 @@ void testMCL(){
         if(compareEstimateToOdom(mcl) < THRESHOLD_DISTANCE){
             chassis.setPose(estimatedPose.x, estimatedPose.y, estimatedPose.theta);
         }
-        pros::delay(1000);
+        pros::delay(500);
     }
 }
