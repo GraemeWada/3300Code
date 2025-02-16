@@ -6,24 +6,23 @@
 //github 
 //https://github.com/unwieldycat/robodash/blob/main/src/main.cpp
 
-// rd::Selector selector({
-//     //Blue or Red indicates team, + or - indicates corner side
-//     //S or R indicates safe or rush
-//     //#pt indicates points
-//     //#/3 indicates number of local WP tasks
-//     //#/4 indicates number of sig WP tasks
-//     {"Blue- S 5pt 2/3 1/4", &blueNegativeSafe},
-//     {"Blue- S 8pt 2/3 unknown", &blueNegative6ring},
-//     {"Blue+ S 4pt 1/3 1/4", &bluePositiveSafe},
-//     {"Blue+ S 6pt 2/3 1/4", &bluePositiveSafe2},
-//     {"Red- S 5pt 2/3 1/4", &redNegativeSafe},
-//     {"Red+ S 4pt 1/3 1/4", &redPositiveSafe},
-//     {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2},
-//     {"Red Elims", &redElim},
-//     {"Skills", &skills2},
-//     {"Test Pure Pursuit Skills", &skillsPPtest}
-// });
-// rd::Console console;
+rd::Selector selector({
+    //Blue or Red indicates team, + or - indicates corner side
+    //S or R indicates safe or rush
+    //#pt indicates points
+    //#/3 indicates number of local WP tasks
+    //#/4 indicates number of sig WP tasks
+    {"Blue- S 5pt 2/3 1/4", &blueNegativeSafe},
+    {"Blue+ S 4pt 1/3 1/4", &bluePositiveSafe},
+    {"Blue+ S 6pt 2/3 1/4", &bluePositiveSafe2},
+    {"Red- S 5pt 2/3 1/4", &redNegativeSafe},
+    {"Red+ S 4pt 1/3 1/4", &redPositiveSafe},
+    {"Red+ S 6pt 2/3 1/4", &redPositiveSafe2},
+    {"Red Elims", &redElim},
+    {"Skills", &skills2},
+    {"Test Pure Pursuit Skills", &skillsPPtest}
+});
+rd::Console console;
 
 
 /**
@@ -49,25 +48,49 @@ void on_center_button() {
  */
 void initialize() {
     chassis.calibrate();
-    pros::lcd::initialize();
 
-    // selector.focus();
+    selector.focus();
 
-    pros::Task ScreenTask([&]() {
-        while (true) {
-            // print robot location to the brain screen
-            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-            // log position telemetry
-            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
-            // delay to save resources
-            pros::delay(50);
-    }
-    });
+    // pros::Task ScreenTask([&]() {
+    //     while (true) {
+    //         // print robot location to the brain screen
+    //         pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+    //         pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+    //         pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+    //         // log position telemetry
+    //         lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+    //         // delay to save resources
+    //         pros::delay(50);
+    // }
+    // });
+    
+\
+    // the default rate is 50. however, if you need to change the rate, you
+    // can do the following.
+    // lemlib::bufferedStdout().setRate(...);
+    // If you use bluetooth or a wired connection, you will want to have a rate of 10ms
+
+    // for more information on how the formatting for the loggers
+    // works, refer to the fmtlib docs
+
+    // thread to for brain screen and position logging
+    // pros::Task ScreenTask([&]() {
+    //     while (true) {
+    //         // print robot location to the brain screen
+    //         pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+    //         pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+    //         pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+    //         // log position telemetry
+    //         lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+    //         // delay to save resources
+    //         pros::delay(50);
+    //     }
+    // });
+}
+
 	
     
-}
+
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -103,10 +126,10 @@ void autonomous() {
     // turn to face heading 90 with a very long timeout
     // blueNegtive();    // chassis.follow(path1_txt, 10, 4000);
     wsr.reset_position();
-     skills2();
-
-    // selector.run_auton();
-
+     //skills2();
+// blueFullSoloAWP();
+// blueFullSoloAWP();
+     selector.run_auton();
 }
 
 //copied from lemlib
@@ -197,6 +220,7 @@ void liftPID(float desiredAngle, float kP, float kD, float settleError = 250){
     static float prevError = 0;
     static float error = 0;
     static float voltScalar = 1.5;
+   
     //desired angle in centidegrees (0-36,000)
     //settle error 250 cdeg
     //idle = 0, primed = 26, scored = 140
@@ -325,7 +349,7 @@ void opcontrol() {
                 liftPID(0, liftP, liftD);
                 break;
                 case 1:
-                liftPID(2500, liftP, liftD);
+                liftPID(3500, liftP, liftD);
                 break;
                 case 2:
                 liftPID(14500, liftP, liftD);

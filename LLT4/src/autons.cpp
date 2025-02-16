@@ -186,7 +186,7 @@ void blueNegativeSafe(){
     chassis.waitUntilDone();
     // intake.move_voltage(-12000);
     pros::delay(500);
-    chassis.moveToPoint(9, 43, 2000);
+    chassis.moveToPoint(8, 41, 2000);
     chassis.waitUntilDone();
     pros::delay(700);
     // intake.move_voltage(0);
@@ -197,8 +197,8 @@ void blueNegativeSafe(){
     chassis.moveToPoint(24, 47, 2000, {.forwards = false});
     chassis.waitUntilDone();
     // intake.move_voltage(0);
-    chassis.moveToPoint(9, 50, 5000);
-    chassis.moveToPoint(24,3,5000,{.maxSpeed=50});
+    chassis.moveToPoint(6, 49, 1000);
+    chassis.moveToPoint(24,3,1000,{.maxSpeed=100});
 }
 
 
@@ -368,36 +368,41 @@ void intakeUntilBlue(){
 }
 
 void blueFullSoloAWP(){
-    chassis.setPose(53.5,31,180);
+   chassis.setPose(53.5,31,180);
 
-    chassis.moveToPoint(54,40,2000,{.forwards = false, .maxSpeed = 75});//push alliance off the line
+    chassis.moveToPoint(49,38,1000,{.forwards = false, .maxSpeed = 75});//push alliance off the line
     
     //score alliacne stake with preload
-    chassis.moveToPoint(53.5,0,2000);
+    chassis.moveToPoint(49,-1,2000);
     chassis.turnToHeading(270,1500,{.maxSpeed=85});
-    chassis.moveToPoint(62,0,1500);
+    chassis.moveToPoint(62,-1,750,{.forwards = false});
+    chassis.waitUntilDone();
     intake.move_voltage(-12000);
     pros::delay(400);
     intake.move_voltage(0);
     //get the goal
-    chassis.moveToPoint(40,0,1500);
-    chassis.moveToPoint(23.5,23.5,1500,{.forwards =false});
+
+    chassis.moveToPoint(40,0,1000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(23.5,23.5,1000,{.forwards =false});
+    chassis.waitUntilDone();
     clampPistons.set_value(true);
     pros::delay(200);
 
     //score rings from stack on our side
-    chassis.moveToPoint(23.5,47,2000);
+    chassis.moveToPoint(23.5,47,1000);
     intake.move_voltage(-12000);
 
     //score rings from stack in middle
-    chassis.moveToPoint(9, 43, 2000, {.maxSpeed=65});
-    pros::delay(500);
-    chassis.moveToPoint(17,47,1500,{.forwards=false,.maxSpeed=60});
+    chassis.moveToPoint(2, 42, 1300, {.maxSpeed=80});
+    // pros::delay(500);
+    // chassis.moveToPoint(17,47,1500,{.forwards=false});
 
-    chassis.moveToPoint(9,50,2000,{.maxSpeed=65});
-    pros::delay(500);
+    // chassis.moveToPoint(9,50,2000,{.maxSpeed=80});
+    // pros::delay(500);
     //touch ladder
-    chassis.moveToPoint(16,11,2000,{.maxSpeed=65});
+    chassis.moveToPoint(16,11,2000);
+}
 
 
 
@@ -408,7 +413,6 @@ void blueFullSoloAWP(){
 
    
 
-}
 
 /**************************************/
 /*                                    */
@@ -420,32 +424,88 @@ void blueFullSoloAWP(){
 /*                                    */
 /***************************************/
 void redNegativeSafe(){
+    // chassis.setPose(-54, 24, 270);
+    // chassis.moveToPoint(-23, 24, 1500, {.forwards = false});
+    // chassis.waitUntil(24);
+    // clampPistons.set_value(true);
+    // pros::delay(500);
+    // intake.move_voltage(-12000);
+    // pros::delay(500);
+    // // intake.move_voltage(12000);
+    // chassis.moveToPoint(-24, 47, 1500);
+    // chassis.waitUntilDone();
+    // // intake.move_voltage(-12000);
+    // pros::delay(500);
+    // chassis.moveToPoint(-12, 43, 1500);
+    // chassis.waitUntilDone();
+    // pros::delay(700);
+    // // intake.move_voltage(0);
+    // // chassis.moveToPose(39,39, 45, 10000, {.forwards = false,.maxSpeed=60});
+    // // chassis.waitUntilDone();
+    // // intake.move_voltage(-12000);
+    // // clampPistons.set_value(false);
+    // chassis.moveToPoint(-24, 47, 1000, {.forwards = false});
+    // chassis.waitUntilDone();
+    // // intake.move_voltage(0);
+    // chassis.moveToPoint(-10, 50, 1500);
+    // pros::delay(500);
+    // chassis.moveToPoint(-24,3,1500,{.maxSpeed=50});
     chassis.setPose(-54, 24, 270);
-    chassis.moveToPoint(-23, 24, 5000, {.forwards = false});
+    chassis.moveToPoint(-23, 24, 2000, {.forwards = false});
     chassis.waitUntil(24);
     clampPistons.set_value(true);
-    pros::delay(500);
+    pros::delay(250);
     intake.move_voltage(-12000);
-    pros::delay(500);
+    pros::delay(200);  
     // intake.move_voltage(12000);
-    chassis.moveToPoint(-24, 47, 5000);
+    chassis.moveToPoint(-24, 47, 2000);
     chassis.waitUntilDone();
     // intake.move_voltage(-12000);
-    pros::delay(500);
-    chassis.moveToPoint(-12, 43, 5000);
+    pros::delay(200);
+    //-8
+    chassis.moveToPoint(-7.5, 41, 2000);
     chassis.waitUntilDone();
-    pros::delay(700);
+    pros::delay(150);
     // intake.move_voltage(0);
     // chassis.moveToPose(39,39, 45, 10000, {.forwards = false,.maxSpeed=60});
     // chassis.waitUntilDone();
     // intake.move_voltage(-12000);
     // clampPistons.set_value(false);
-    chassis.moveToPoint(-24, 47, 5000, {.forwards = false});
-    chassis.waitUntilDone();
+    chassis.moveToPoint(-24, 47, 2000, {.forwards = false, .earlyExitRange = 5});
+  
     // intake.move_voltage(0);
-    chassis.moveToPoint(-10, 50, 5000);
-    pros::delay(500);
-    chassis.moveToPoint(-24,3,5000,{.maxSpeed=50});
+    //new
+    //-9,49
+    chassis.moveToPoint(-8, 52, 1000);
+     pros::Task screenTask([&]() {
+        color.set_led_pwm(100);
+            while (true) {
+                int redMin = 9;
+                int redMax = 18;
+                int blueMin = 190;
+                int blueMax = 250;
+                while(true){
+                    
+                        
+                            if(color.get_hue()>blueMin&& color.get_hue()<blueMax){
+                                pros::delay(75);
+                                intake.move_voltage(12000);
+                                pros::delay(80);
+                                intake.move_voltage(-12000);
+                                // console.print("saw blue");
+                            }
+
+                            
+                       
+                pros::delay(10);
+        }
+    }});
+    chassis.moveToPose(-48,0, 180, 2500);
+    chassis.moveToPoint(-48,-18, 1000);
+    intake.move_voltage(-12000);
+    
+
+
 }
 
 void redPositiveSafe(){

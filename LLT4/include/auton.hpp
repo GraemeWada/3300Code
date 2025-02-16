@@ -11,5 +11,6 @@ extern void redElim();
 extern void skills2();
 extern void skillsPPtest();
 extern void  blueElimsWS();
+extern void blueFullSoloAWP();
 
 extern void test();
