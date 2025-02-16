@@ -8,7 +8,8 @@
 
 const double MM_TO_INCH = 0.0393701;
 const int NUM_PARTICLES = 1000;
-const double SENSOR_NOISE = 1.0; // Adjust noise level as needed
+const double SENSOR_NOISE = 30.0; // Adjust noise level as needed
+const double THRESHOLD_DISTANCE = 2; //distance before MCL position is accepted
 const double GRID_SIZE = 140.0;
 
 struct Pose {
@@ -16,7 +17,7 @@ struct Pose {
 };
 
 struct Sensor {
-    double x_offset, y_offset;
+    double x_offset, y_offset, theta_offset;
 };
 
 struct Particle {
@@ -46,10 +47,52 @@ public:
     }
 
     double expectedSensorReading(const Pose& pose, const Sensor& sensor) {
-        double sensor_x = pose.x + sensor.x_offset * cos(pose.theta) - sensor.y_offset * sin(pose.theta);
-        double sensor_y = pose.y + sensor.x_offset * sin(pose.theta) + sensor.y_offset * cos(pose.theta);
-        return std::min({fabs(sensor_x - (-GRID_SIZE / 2)), fabs(sensor_x - (GRID_SIZE / 2)),
-                         fabs(sensor_y - (-GRID_SIZE / 2)), fabs(sensor_y - (GRID_SIZE / 2))});
+        // Convert pose.theta from degrees to radians
+        double theta_rad = -(pose.theta - 90) * M_PI / 180.0;
+
+        // Transform sensor position based on robot's heading (adjusted for clockwise rotation)
+        double rotated_x_offset = sqrt(pow(sensor.x_offset, 2) + pow(sensor.y_offset, 2)) * cos(theta_rad);
+        double rotated_y_offset = sqrt(pow(sensor.x_offset, 2) + pow(sensor.y_offset, 2)) * sin(theta_rad);
+    
+        double sensor_x = pose.x + rotated_x_offset;
+        double sensor_y = pose.y + rotated_y_offset;
+    
+        return computePQ(sensor_x, sensor_y, theta_rad + sensor.theta_offset, GRID_SIZE);
+        // Compute distance to nearest boundary of the grid
+        // return std::min({fabs(sensor_x - (-GRID_SIZE / 2)), fabs(sensor_x - (GRID_SIZE / 2)),
+        //                  fabs(sensor_y - (-GRID_SIZE / 2)), fabs(sensor_y - (GRID_SIZE / 2))});
+    }
+    
+    double computePQ(double p_x, double p_y, double theta, double L) {
+        // Calculate the direction components of the ray (cos(theta), sin(theta))
+        double cos_theta = cos(theta);
+        double sin_theta = sin(theta);
+        
+        // Initialize the intersection times with large values
+        double t_x = std::numeric_limits<double>::infinity();
+        double t_y = std::numeric_limits<double>::infinity();
+        
+        // Compute t_x (intersection with vertical sides of the square)
+        if (cos_theta != 0) {
+            if (cos_theta > 0) {
+                t_x = (L / 2.0 - p_x) / cos_theta;  // Right side
+            } else {
+                t_x = (-L / 2.0 - p_x) / cos_theta; // Left side
+            }
+        }
+        
+        // Compute t_y (intersection with horizontal sides of the square)
+        if (sin_theta != 0) {
+            if (sin_theta > 0) {
+                t_y = (L / 2.0 - p_y) / sin_theta;  // Top side
+            } else {
+                t_y = (-L / 2.0 - p_y) / sin_theta; // Bottom side
+            }
+        }
+        
+        // Return the smaller positive t value, which represents the first intersection
+        std::cout << std::to_string(std::min(t_x, t_y)) + "\n";
+        return std::min(t_x, t_y);
     }
 
     void updateWeights(double front, double left, double right, const Pose& robotPose, const Sensor sensors[3]) {
@@ -65,7 +108,11 @@ public:
             
             p.weight = front_prob * left_prob * right_prob;
             sum_weights += p.weight;
+            std::cout << std::to_string(p.weight) + " "+std::to_string(front_prob)+ " " + std::to_string(left_prob) + " " + std::to_string(right_prob) + " " 
+            + std::to_string(front_expected) + " " + std::to_string(left_expected) + " " + std::to_string(right_expected) + "\n";
         }
+
+        if (sum_weights == 0) sum_weights = 1e-6;
         
         for (auto& p : particles) {
             p.weight /= sum_weights;
@@ -103,11 +150,20 @@ public:
         }
         // pros::lcd::set_text(4, std::to_string(x_sum));
         // pros::lcd::set_text(5, std::to_string(y_sum));
-        
-        
         return {x_sum, y_sum, chassis.getPose().theta};
     }
+
+    
 };
+
+//compares estimate 
+    double compareEstimateToOdom(MonteCarloLocalization mcl){
+        Pose estimatedPose = mcl.getEstimatedPose();
+        lemlib::Pose chassisPose = chassis.getPose();
+
+        double distance = sqrt(pow(estimatedPose.x - chassisPose.x, 2) + pow(estimatedPose.y - chassisPose.y, 2));
+        return distance;
+    }
 
 //example function
 int main() {
@@ -140,35 +196,28 @@ void testMCL(){
     MonteCarloLocalization mcl;
     
     Sensor sensors[3] = {
-        {6.5, 4.5}, // Front sensor offset (in inches)
-        {-5.9, 3.125}, // Left sensor offset
-        {5.9, 3.125} // Right sensor offset
+        {4.5, 6.5, 0}, // Front sensor offset (in inches)
+        {-5.9, 3.125, -90}, // Left sensor offset
+        {5.9, 3.125, 90} // Right sensor offset
     };
     while(true){
         double frontReading = upSensor.get();
-        if(!(frontReading > 0 || frontReading < 1750)){
-            frontReading = 1750;
-        } // Example sensor readings in mm
         double leftReading = leftSensor.get();
-        if(!(leftReading > 0 || leftReading < 1750)){
-            leftReading = 1750;
-        } 
         double rightReading = rightSensor.get();
-        if(!(rightReading > 0 || rightReading < 1750)){
-            rightReading = 1750;
-        } 
 
-        pros::lcd::set_text(4, std::to_string(frontReading));
-            pros::lcd::set_text(5, std::to_string(leftReading));
-            pros::lcd::set_text(6, std::to_string(rightReading));
+        pros::lcd::set_text(4, std::to_string(frontReading) + ", " + std::to_string(leftReading) + ", " + std::to_string(rightReading));
     
         Pose robotPose = {chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta}; // Assume we get this from chassis.getPose().theta
     
-        mcl.updateWeights(frontReading, leftReading, rightReading, robotPose, sensors);
+        mcl.updateWeights(frontReading * MM_TO_INCH, leftReading * MM_TO_INCH, rightReading * MM_TO_INCH, robotPose, sensors);
         mcl.resampleParticles();
         Pose estimatedPose = mcl.getEstimatedPose();
-    
-        chassis.setPose(estimatedPose.x, estimatedPose.y, estimatedPose.theta);
-        pros::delay(100);
+        pros::lcd::set_text(5, std::to_string(estimatedPose.x));
+        pros::lcd::set_text(6, std::to_string(estimatedPose.y));
+
+        if(compareEstimateToOdom(mcl) < THRESHOLD_DISTANCE){
+            chassis.setPose(estimatedPose.x, estimatedPose.y, estimatedPose.theta);
+        }
+        pros::delay(50);
     }
 }

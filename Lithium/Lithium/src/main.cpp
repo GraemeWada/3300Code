@@ -179,6 +179,8 @@ float computeLiftError(float desiredAngle, float settleError = 50){
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+    chassis.setPose(-60, 0, 90);
+    testMCL();
 	// loop forever
     double time = pros::millis();
 	bool clamp = false;
