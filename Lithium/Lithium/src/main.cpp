@@ -138,15 +138,15 @@ void autonomous() {
         }
 
     });
-    // skills9();
+    skills9();
     // testMCL();
-    chassis.setPose(0,0,0);
-    chassis.turnToHeading(180, 1000);
-    chassis.waitUntilDone();
-    chassis.turnToHeading(90, 1000);
-    chassis.waitUntilDone();
-    chassis.turnToHeading(0,1000);
-    chassis.waitUntilDone();
+    // chassis.setPose(0,0,0);
+    // chassis.turnToHeading(180, 1000);
+    // chassis.waitUntilDone();
+    // chassis.turnToHeading(90, 1000);
+    // chassis.waitUntilDone();
+    // chassis.turnToHeading(0,1000);
+    // chassis.waitUntilDone();
     
     // chassis.moveToPoint(0,24,5000);
     // chassis.waitUntilDone();
@@ -164,7 +164,6 @@ void autonomous() {
     // //move forwards
     // chassis.moveToPoint(-36, -48, 5000);
     // chassis.waitUntilDone();
-    // return;
     // //move forwards when turning
     // chassis.turnToHeading(90, 1000);
     // chassis.waitUntilDone();
@@ -172,7 +171,6 @@ void autonomous() {
     // chassis.waitUntilDone();
     // chassis.turnToHeading(315, 4000);
     // chassis.waitUntilDone();
-    // return;
     // chassis.moveToPoint(0,0,5000);
     // chassis.waitUntilDone();
     // chassis.moveToPoint(-48, 48, 5000);
@@ -214,8 +212,8 @@ void opcontrol() {
 	bool clamp = false;
 	bool descoring = false;
     int i = 0;
-	ws.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-    wsr.reset();
+	// ws.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    // wsr.reset();
 
     lemlib::PID liftpid(3, 0, 3);
     liftpid.reset();
@@ -274,22 +272,22 @@ void opcontrol() {
             i = 4;
         }
 
-        switch(i){
-            case 0:
-            ws.move_voltage(-liftpid.update(computeLiftError(700, 10)));
-            break;
-            case 1:
-            ws.move_voltage(-liftpid.update(computeLiftError(2400)));
-            break;
-            case 2:
-            ws.move_voltage(-liftpid.update(computeLiftError(15500)));
-            break;
-            case 3:
-            ws.move_voltage(-liftpid.update(computeLiftError(21000)));
-            break;
-            case 4:
-            ws.move_voltage(-liftpid.update(computeLiftError(5000)));
-        }
+        // switch(i){
+        //     case 0:
+        //     ws.move_voltage(-liftpid.update(computeLiftError(700, 10)));
+        //     break;
+        //     case 1:
+        //     ws.move_voltage(-liftpid.update(computeLiftError(2400)));
+        //     break;
+        //     case 2:
+        //     ws.move_voltage(-liftpid.update(computeLiftError(15500)));
+        //     break;
+        //     case 3:
+        //     ws.move_voltage(-liftpid.update(computeLiftError(21000)));
+        //     break;
+        //     case 4:
+        //     ws.move_voltage(-liftpid.update(computeLiftError(5000)));
+        // }
 
         // move the robot
         chassis.arcade(leftY, rightX);

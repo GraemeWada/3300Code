@@ -7,7 +7,7 @@ alliance color = alliance::RED;
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-pros::MotorGroup left({-11, -12, 13}, pros::MotorGearset::blue);
+pros::MotorGroup left({-16, -12, 13}, pros::MotorGearset::blue);
 pros::MotorGroup right({6, -7, 9}, pros::MotorGearset::blue);
 
 pros::Motor intake(-10);
@@ -37,7 +37,7 @@ lemlib::Drivetrain drivetrain(&left, &right, 11.5, lemlib::Omniwheel::NEW_325, 4
 // lateral PID controller 7 0 35
 lemlib::ControllerSettings lateral_controller(5, // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              15, // derivative gain (kD)
+                                              20, // derivative gain (kD)
                                               3, // anti windup
                                               1, // small error range, in inches
                                               100, // small error range timeout, in milliseconds

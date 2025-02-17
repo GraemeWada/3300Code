@@ -1819,7 +1819,7 @@ void skills8(){
     
     //move to wall stake
     chassis.moveToPoint(1, -43, 1500, {.forwards = false, .maxSpeed = 90});
-    pros::delay(500);
+    pros::delay(700);
     intakeState = Stop();
     //wiggle intake
     pros::delay(100);
@@ -2022,7 +2022,7 @@ void skills9(){
     //set start pose
     chassis.setPose(-60, 0, 90);
 
-    //Part one
+    //SPLIT ONE
  
     //score alliance stake
     intakeState = Intake();
@@ -2036,52 +2036,46 @@ void skills9(){
  
     //get goal
     chassis.moveToPoint(-48,-24,3000,{.forwards=false});
-    chassis.waitUntilDone();
+    chassis.waitUntil(25);
     clampPistons.set_value(true);
     // pros::delay(100);
  
     //get 1st ring
     intakeState = Intake();
     chassis.cancelMotion();
-    chassis.moveToPoint(-24, -24, 3000, {.maxSpeed = 100, .earlyExitRange = 1});
+    chassis.moveToPoint(-24, -24, 3000, {.maxSpeed = 100, .minSpeed = 80, .earlyExitRange = 1});
     chassis.waitUntilDone();
     //drive around ladder
-    chassis.moveToPoint(0, -38, 3000, {.maxSpeed = 100, .earlyExitRange = 2});
+    chassis.moveToPoint(0, -38, 3000, {.maxSpeed = 100, .minSpeed = 80, .earlyExitRange = 2});
     //ring 2
     chassis.moveToPoint(24, -48, 3000, {.maxSpeed = 80});
-    pros::delay(500);
+    pros::delay(200);
     liftState = 1; detectStalls = false; liftpid.reset();
-    pros::delay(1200);
-    //wiggle
-    pros::delay(100);
-    intakeState = Intake();
-    pros::delay(100);
-    intakeState = Stop();
-    pros::delay(100);
-    intakeState = Intake();
-    pros::delay(100);
-    intakeState = Stop();
-    pros::delay(100);
-    intakeState = Intake();
-    pros::delay(100);
-    intakeState = Stop();
-    pros::delay(100);
-    liftState = 4; detectStalls = true; liftpid.reset();
+    
     
     chassis.waitUntilDone();
     //move to wall stake
-    chassis.moveToPoint(0, -42, 3000, {.forwards = false, .maxSpeed = 100});
+    chassis.moveToPoint(0, -42, 3000, {.forwards = false, .maxSpeed = 70});
+    pros::delay(700);
+    intakeState = Stop();
+    pros::delay(100);
+    intakeState = Intake();
     chassis.waitUntilDone();
+    intakeState = Stop();
+    pros::delay(50);
+    liftState = 4; detectStalls = true; liftpid.reset();
     chassis.turnToHeading(180, 500);
     chassis.waitUntilDone();
+    
+    
     //drive to wall stake
     chassis.moveToPoint(0, -65, 3000, {.maxSpeed = 60});
     intakeState = Intake();
     //score
-    pros::delay(1000);
+    pros::delay(900);
     liftState = 2; liftpid.reset();
     chassis.cancelMotion();
-    pros::delay(750);
+    pros::delay(800);
     
     chassis.moveToPoint(0, -48, 3000, {.forwards = false, .minSpeed = 90, .earlyExitRange = 2});
     pros::delay(50);
@@ -2093,36 +2087,37 @@ void skills9(){
     //last ring
     chassis.moveToPose(-30, -58, 90, 2000, {.maxSpeed = 60});
     chassis.waitUntilDone();
-    pros::delay(500);
+    pros::delay(100);
     //corner 
     chassis.moveToPoint(-64, -64, 1000, {.forwards = false});
     chassis.waitUntilDone();
     clampPistons.set_value(false);
     intakeState = Intake(false);
-    // computePossibleLocation(); computePossibleLocation(); computePossibleLocation();
-    //grab ring right top of ladder
+
+    //SPLIT TWO
+
+    //alliance stake ring
     liftState = 1; liftpid.reset(); detectStalls = false;
-    chassis.moveToPoint(48, -46, 2500, {.maxSpeed = 100});
+    chassis.moveToPoint(43, -46, 2500, {.maxSpeed = 100});
     pros::delay(100);
     // computePossibleLocation(); computePossibleLocation(); computePossibleLocation();
     intakeState = Intake();
     chassis.waitUntilDone();
+    
+    chassis.turnToHeading(215, 300);
     pros::delay(300);
-    intakeState = Stop();
-    chassis.turnToHeading(215, 1000);
     chassis.waitUntilDone();
     
     //grab goal
-    chassis.moveToPoint(59, -24, 1000, {.forwards = false, .maxSpeed = 70});
+    chassis.moveToPoint(59, -24, 1000, {.forwards = false, .maxSpeed = 70, .minSpeed = 50, .earlyExitRange = 1});
     chassis.waitUntilDone();
     clampPistons.set_value(true);
-    intakeState = Intake();
-    chassis.turnToHeading(354, 1000);
+    chassis.turnToHeading(354, 500);
     chassis.waitUntilDone();
-    
-    pros::delay(200);
+    pros::delay(100);
     clampPistons.set_value(false);
-    chassis.moveToPoint(64, -64, 3000, {.forwards = false});
+    pros::delay(100);
+    chassis.moveToPoint(64, -64, 1500, {.forwards = false, .minSpeed = 100});
     chassis.waitUntilDone();
     intakeState = Stop();
     //move to goal
@@ -2137,15 +2132,15 @@ void skills9(){
     clampPistons.set_value(true);
     chassis.turnToHeading(90, 500);
     chassis.waitUntilDone();
-    chassis.moveToPoint(70, 0, 1000, {.maxSpeed = 80});
+    chassis.moveToPoint(70, 0, 600, {.maxSpeed = 80});
     chassis.waitUntilDone();
     //alignment
-    chassis.moveToPoint(chassis.getPose().x-6, chassis.getPose().y, 3000, {.forwards = false, .maxSpeed = 30});
+    chassis.moveToPoint(chassis.getPose().x-7, chassis.getPose().y, 3000, {.forwards = false, .maxSpeed = 60});
     chassis.waitUntilDone();
-    liftState = 3; liftpid.reset();
-    pros::delay(1000);
+    liftState = 3; liftpid.reset(); detectStalls = true;
+    pros::delay(500);
     //backsup
-    chassis.moveToPoint(46,0,3000,{.forwards = false});
+    chassis.moveToPoint(48,0,3000,{.forwards = false,.minSpeed = 70});
     chassis.waitUntilDone();
     liftState=0; liftpid.reset();
 
@@ -2156,28 +2151,123 @@ void skills9(){
     
     chassis.turnToHeading(315,500,{.maxSpeed=100});
     chassis.waitUntilDone();
+    pros::delay(500);
+    intakeState = Stop();
+    
     
     //ladder ring
-    chassis.moveToPose(-3,3,315,3000,{.lead = 0.05, .maxSpeed = 70});
+    chassis.moveToPose(-3,3,315,1500,{.lead = 0.05, .maxSpeed = 100, .minSpeed = 70});
+    pros::delay(700);
+    intakeState = Intake();
     chassis.waitUntilDone();
-    pros::delay(1000);
+    pros::delay(200);
+    intakeState = Stop();
     //ring after ladder (bottom left ladder)
-    chassis.moveToPose(-24,24,315, 3000, {.lead = 0.05,.maxSpeed = 70});
+    chassis.moveToPose(-24,24,315, 1500, {.lead = 0.05,.maxSpeed = 100});
+    pros::delay(1000);
+    intakeState = Intake();
     chassis.waitUntilDone();
     //corner ring in cluster
-    chassis.moveToPoint(-48, 48, 3000, {.maxSpeed = 65});
+    chassis.moveToPoint(-45, 49, 3000, {.maxSpeed = 80});
     chassis.waitUntilDone();
     //left ring
-    chassis.moveToPoint(-60, 48, 3000, {.maxSpeed = 50});
+    chassis.moveToPoint(-60, 48, 3000, {.maxSpeed = 70});
     chassis.waitUntilDone();
     //right ring
     chassis.turnToHeading(45, 300);
     chassis.waitUntilDone();
     chassis.moveToPoint(-42, 66, 3000, {.maxSpeed = 80});
     chassis.waitUntilDone();
-    chassis.moveToPoint(-60,60,1000,{.forwards=false});
+    chassis.turnToHeading(120, 500);
     chassis.waitUntilDone();
     clampPistons.set_value(false);
-    pros::delay(10000);
-    // chassis.turnToHeading();
+    intakeState = Stop();
+    pros::delay(50);
+    chassis.moveToPoint(-64,70,1000,{.forwards=false});
+    chassis.waitUntilDone();
+    clampPistons.set_value(false);
+    intakeState = Intake(false);
+    pros::delay(100);
+    intakeState = Stop();
+
+    //SPLIT THREE
+
+    //grab ring for next wall stake
+    chassis.moveToPoint(-17, 45, 1500, {.maxSpeed = 100});
+    pros::delay(100);
+    liftState = 1; liftpid.reset(); detectStalls = false;
+    intakeState = Intake();
+    chassis.waitUntilDone();
+    
+    //grab goal
+    chassis.moveToPoint(-48, 24, 1500, {.forwards = false, .maxSpeed = 80});
+    pros::delay(800);
+    intakeState = Stop();
+    pros::delay(100);
+    intakeState = Intake();
+    chassis.waitUntilDone();
+    clampPistons.set_value(true);
+    
+    //move in front of wall stake
+    chassis.moveToPoint(4, 42, 1500, {.maxSpeed = 100});
+    intakeState = Stop();
+    liftState = 4; liftpid.reset(); detectStalls = true;
+    chassis.waitUntilDone();
+    //turn to wall stake
+    chassis.turnToHeading(0, 500);
+    chassis.waitUntilDone();
+    //drive to wall stake
+    chassis.moveToPoint(5, 70, 3000, {.maxSpeed = 60});
+    intakeState = Intake();
+    //score
+    pros::delay(900);
+    liftState = 2; liftpid.reset();
+    chassis.cancelMotion();
+    pros::delay(800);
+    //move away from wall stake
+    chassis.moveToPoint(5, 48, 3000, {.forwards = false, .minSpeed = 90, .earlyExitRange = 2});
+    pros::delay(50);
+    liftState = 0; liftpid.reset();
+    chassis.waitUntilDone();
+    //move to ring closest
+    chassis.moveToPoint(24, 48, 1000, {.maxSpeed = 100, .minSpeed = 80, .earlyExitRange = 2});
+    chassis.waitUntilDone();
+    //move to ring on right 
+    chassis.moveToPoint(24, 24, 1000, {.maxSpeed = 100});
+    chassis.waitUntilDone();
+    //center to right of ring cluster
+    chassis.turnToHeading(45, 300);
+    chassis.waitUntilDone();
+    chassis.moveToPose(68, 42, 90, 3000, {.maxSpeed = 110, .minSpeed = 90});
+    chassis.waitUntilDone();
+    //left of ring cluster
+    chassis.moveToPose(52, 30, 0, 2500, {.forwards = false, .maxSpeed = 80, .minSpeed = 60});
+    chassis.waitUntilDone();
+    chassis.moveToPose(28, 59, 270, 2500, {.maxSpeed = 100});
+    chassis.waitUntilDone();
+    //corner
+    chassis.turnToPoint(64, 64, 400, {.forwards = false});
+    chassis.waitUntilDone();
+    intakeState = Intake(false);
+    clampPistons.set_value(false);
+    pros::delay(100);
+    chassis.moveToPoint(64, 64, 1500, {.forwards = false});
+    
+    chassis.waitUntilDone();
+    intakeState = Stop();
+    //climb
+    chassis.moveToPoint(36, 36, 1000, {.minSpeed = 90});
+    chassis.waitUntilDone();
+    liftState = 2; liftpid.reset();
+    chassis.turnToHeading(45, 300);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(0, 0, 1700, {.forwards = false, .maxSpeed = 80, .minSpeed = 70});
+    chassis.waitUntilDone();
+    liftState = 4; liftpid.reset();
+    left.move_voltage(12000);
+    right.move_voltage(12000);
+    pros::delay(200);
+    left.move_voltage(0);
+    right.move_voltage(0);
+    pros::delay(5000);
 }
