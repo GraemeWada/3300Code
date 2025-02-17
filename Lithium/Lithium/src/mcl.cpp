@@ -9,10 +9,11 @@
 //TUNE THESE
 const double SENSOR_NOISE = 10.0; // Adjust noise level as needed
 const double THRESHOLD_DISTANCE = 2; //distance before MCL position is accepted
-const int NUM_PARTICLES = 1000; //adjust number of particles
-const double POSITION_VARIATION = 3; //maximum variation in position when resampling
-const double ANGLE_VARIATION = 8; //maximum variation in theta when resampling
-const float ACCEPTANCE_PERCENT = 0.125; //percent of highest weighted particles to accept for resampling
+const int NUM_PARTICLES = 500; //adjust number of particles
+const double POSITION_VARIATION = 4; //maximum variation in position when resampling
+const double ANGLE_VARIATION = 10; //maximum variation in theta when resampling
+const float ACCEPTANCE_PERCENT = 0.05; //percent of highest weighted particles to accept for resampling
+const double SENSOR_MAX_RANGE = 2500;
 
 const double MM_TO_INCH = 0.0393701;
 const double GRID_SIZE = 140.0;
@@ -104,31 +105,54 @@ public:
         }
         
         // Return the smaller positive t value, which represents the first intersection
-        std::cout << std::to_string(std::min(t_x, t_y)) + "\n";
-        return std::min(t_x, t_y);
+        std::cout << "\n" + std::to_string(p_x/25.4) + " " + std::to_string(p_y/25.4) + " "+ std::to_string(theta)+"\n";
+        std::cout << std::to_string(std::min(fabs(t_x), fabs(t_y))) + "\n";
+        return std::min(fabs(t_x), fabs(t_y));
     }
 
     void updateWeights(double front, double left, double right, const Pose& robotPose, const Sensor sensors[3]) {
-        double sum_weights = 0.0;
-        for (auto& p : particles) {
-            //update pose of all particles based on dead reckoning
-            double deltaX = robotPose.x - lastPose.x;
-            double deltaY = robotPose.y - lastPose.y;
-            double deltaTheta = robotPose.theta - lastPose.theta;
+        int valid_sensor_count = 0;
+        if (front <= SENSOR_MAX_RANGE) valid_sensor_count++;
+        if (left <= SENSOR_MAX_RANGE) valid_sensor_count++;
+        if (right <= SENSOR_MAX_RANGE) valid_sensor_count++;
 
-            p.pose.x += deltaX;
-            p.pose.y += deltaY;
-            p.pose.theta += deltaTheta;
+        if (valid_sensor_count < 2) return;
+
+        double sum_weights = 0.0;
+        double deltaX = robotPose.x - lastPose.x;
+        double deltaY = robotPose.y - lastPose.y;
+        double deltaTheta = robotPose.theta - lastPose.theta;
+        lastPose = robotPose;
+
+        for (auto& p : particles) {
+            // //update pose of all particles based on dead reckoning
+            // double theta_rad = -(p.pose.theta - 90) * M_PI / 180.0; //get heading of particle
+            // double adjustedDeltaX = sqrt(pow(deltaX, 2) + pow(deltaY, 2)) * cos(theta_rad); //adjust delta X and Y for rotation of particle
+            // double adjustedDeltaY = sqrt(pow(deltaX, 2) + pow(deltaY, 2)) * sin(theta_rad);
+            // //apply adjustments
+            // p.pose.x += adjustedDeltaX;
+            // p.pose.y += adjustedDeltaY;
+            // p.pose.theta += deltaTheta;
 
             double front_expected = expectedSensorReading(p.pose, sensors[0]) * MM_TO_INCH;
             double left_expected = expectedSensorReading(p.pose, sensors[1]) * MM_TO_INCH;
             double right_expected = expectedSensorReading(p.pose, sensors[2]) * MM_TO_INCH;
             //takes gaussian probability, might need to be changed
-            double front_prob = exp(-pow(front - front_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE));
-            double left_prob = exp(-pow(left - left_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE));
-            double right_prob = exp(-pow(right - right_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE));
+            // double front_prob = exp(-pow(front - front_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE));
+            // double left_prob = exp(-pow(left - left_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE));
+            // double right_prob = exp(-pow(right - right_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE));
+            double front_prob = (front <= SENSOR_MAX_RANGE) ? exp(-pow(front - front_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE)) : 1.0;
+            double left_prob = (left <= SENSOR_MAX_RANGE) ? exp(-pow(left - left_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE)) : 1.0;
+            double right_prob = (right <= SENSOR_MAX_RANGE) ? exp(-pow(right - right_expected, 2) / (2 * SENSOR_NOISE * SENSOR_NOISE)) : 1.0;
+            
             
             p.weight = front_prob * left_prob * right_prob;
+            
+            //if particle position is more than 1 field tile away from tracking wheel position, the particle weight is zero
+            if(sqrt(pow(p.pose.x-robotPose.x, 2) + pow(p.pose.y-robotPose.y, 2) > 24)){
+                p.weight = 0;
+            }
+
             sum_weights += p.weight;
             
             std::cout << "prob: " + std::to_string(front_prob)+ " " + std::to_string(left_prob) + " " + std::to_string(right_prob) + " " 
@@ -215,7 +239,7 @@ int main() {
     mcl.resampleParticles();
     Pose estimatedPose = mcl.getEstimatedPose();
     
-    chassis.setPose(estimatedPose.x, estimatedPose.y, estimatedPose.theta);
+    chassis.setPose(estimatedPose.x, estimatedPose.y, (estimatedPose.theta * 0.05 + chassis.getPose().theta * 0.95));//lower weight to MCL heading correction
     
     return 0;
 }

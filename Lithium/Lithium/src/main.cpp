@@ -139,21 +139,49 @@ void autonomous() {
 
     });
     // skills9();
-    testMCL();
-    // chassis.setPose(0,0,0);
-    // chassis.turnToHeading(180, 1000);
-    // chassis.waitUntilDone();
-    // chassis.turnToHeading(90, 1000);
-    // chassis.waitUntilDone();
-    // chassis.turnToHeading(0,1000);
-    // chassis.waitUntilDone();
+    // testMCL();
+    chassis.setPose(0,0,0);
+    chassis.turnToHeading(180, 1000);
+    chassis.waitUntilDone();
+    chassis.turnToHeading(90, 1000);
+    chassis.waitUntilDone();
+    chassis.turnToHeading(0,1000);
+    chassis.waitUntilDone();
     
     // chassis.moveToPoint(0,24,5000);
     // chassis.waitUntilDone();
     // chassis.moveToPoint(0,0,5000,{.forwards = false});
     // chassis.waitUntilDone();
-}
 
+
+    // //PID TUNE AUTON
+    // chassis.setPose(-60, 0, 90);
+    // chassis.moveToPoint(-36, 0, 5000);
+    // chassis.waitUntilDone();
+    // //turn right
+    // chassis.turnToHeading(180, 4000);
+    // chassis.waitUntilDone();
+    // //move forwards
+    // chassis.moveToPoint(-36, -48, 5000);
+    // chassis.waitUntilDone();
+    // return;
+    // //move forwards when turning
+    // chassis.turnToHeading(90, 1000);
+    // chassis.waitUntilDone();
+    // chassis.moveToPoint(48, -48, 5000);
+    // chassis.waitUntilDone();
+    // chassis.turnToHeading(315, 4000);
+    // chassis.waitUntilDone();
+    // return;
+    // chassis.moveToPoint(0,0,5000);
+    // chassis.waitUntilDone();
+    // chassis.moveToPoint(-48, 48, 5000);
+    // chassis.waitUntilDone();
+
+    // chassis.setPose(0,0,0);
+    // chassis.turnToHeading(180, 100000);
+
+}
 
 float computeLiftError(float desiredAngle, float settleError = 50){
     static float error = 0;
@@ -179,8 +207,8 @@ float computeLiftError(float desiredAngle, float settleError = 50){
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    chassis.setPose(-60, 0, 90);
-    testMCL();
+    // chassis.setPose(-60, 0, 90);
+    // testMCL();
 	// loop forever
     double time = pros::millis();
 	bool clamp = false;
