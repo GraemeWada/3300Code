@@ -226,10 +226,76 @@ void opcontrol() {
     bool PTO=false;
     double ptoTime = 85000;
 
+    bool colourSortOn = true;
+
+    pros::Task intakeWithSort([&](){
+        int degsToReverse = 170;
+        int inRotationStart = 0;
+        static int redMin = 9;
+        static int redMax = 18;
+        static int blueMin = 190;
+        static int blueMax = 250;
+        bool hasSeenRejection = false;
+        optical.set_led_pwm(100);
+
+        while(true){
+            if(inState == intakeState::IN){
+                intake.move_voltage(12000);
+                //colour sortign
+                if(colourSortOn){
+                    if(color == alliance::RED){
+                        if(optical.get_hue()>blueMin&& optical.get_hue()<blueMax && !hasSeenRejection ){
+                            intake.tare_position();
+                            inRotationStart = intake.get_position();
+                            hasSeenRejection = true;
+
+                            pros::lcd::print(4, "Proximty %ld", optical.get_proximity()); // heading
+
+
+
+                        }
+                        if(hasSeenRejection && optical.get_proximity()<=210){
+                            intake.move_voltage(-12000);
+                            pros::delay(90);
+                            hasSeenRejection = false;
+                        }
+                    }
+                    else if(color == alliance::BLUE){
+                        
+                        if(optical.get_hue()>redMin&& optical.get_hue()<redMax && !hasSeenRejection ){
+                            intake.tare_position();
+                            inRotationStart = intake.get_position();
+                            hasSeenRejection = true;
+
+                            pros::lcd::print(4, "seen red"); // heading
+
+
+
+                        }
+                        if(hasSeenRejection && optical.get_proximity()<=210){
+                            intake.move_voltage(-12000);
+                            pros::delay(90);
+                            hasSeenRejection = false;
+                        }
+                    }
+                }
+            } else if(inState == intakeState::OUT){
+                intake.move_voltage(-12000);
+            } else {
+                intake.move_voltage(0);
+                intake.brake();
+                intake.tare_position();
+                
+            }
+            pros::delay(5);
+        }
+
+    });
+
     while (true) {
         
-        if(controller.get_digital(DIGITAL_A)){
-            controller.rumble("-");
+        if(controller.get_digital_new_press(DIGITAL_Y)){
+            
             PTO = !PTO;
             pto.set_value(PTO);
         }
@@ -239,12 +305,20 @@ void opcontrol() {
         int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
 
 		if(controller.get_digital(DIGITAL_R1)){
-    	    intake.move_voltage(12000);
+    	    // intake.move_voltage(12000);
+            inState = intakeState::IN;
         } else if (controller.get_digital(DIGITAL_R2)){
-            intake.move_voltage(-12000);
+            // intake.move_voltage(-12000);
+            inState = intakeState::OUT;
         } else {
-            intake.brake();
+            // intake.brake();
+            inState = intakeState::STOP;
 		}
+
+        if(controller.get_digital_new_press(DIGITAL_B)){
+            controller.rumble("-");
+            colourSortOn = !colourSortOn;
+        }
 
 		if(controller.get_digital_new_press(DIGITAL_L1)){
 			clamp = !clamp;
@@ -272,22 +346,29 @@ void opcontrol() {
             i = 4;
         }
 
-        // switch(i){
-        //     case 0:
-        //     ws.move_voltage(-liftpid.update(computeLiftError(700, 10)));
-        //     break;
-        //     case 1:
-        //     ws.move_voltage(-liftpid.update(computeLiftError(2400)));
-        //     break;
-        //     case 2:
-        //     ws.move_voltage(-liftpid.update(computeLiftError(15500)));
-        //     break;
-        //     case 3:
-        //     ws.move_voltage(-liftpid.update(computeLiftError(21000)));
-        //     break;
-        //     case 4:
-        //     ws.move_voltage(-liftpid.update(computeLiftError(5000)));
-        // }
+        switch(i){
+            case 0:
+            ws.move_voltage(-liftpid.update(computeLiftError(700, 10)));
+            break;
+            case 1:
+            ws.move_voltage(-liftpid.update(computeLiftError(2600, 100)));
+            break;
+            case 2:
+            ws.move_voltage(-liftpid.update(computeLiftError(19500)));
+            break;
+            case 3:
+            ws.move_voltage(-liftpid.update(computeLiftError(21000)));
+            break;
+            case 4:
+            ws.move_voltage(-liftpid.update(computeLiftError(6500)));
+        }
+
+        if(controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)){
+            chassis.setPose(0,0,90);
+            chassis.moveToPoint(chassis.getPose().x-7, chassis.getPose().y, 2000, {.forwards = false, .maxSpeed = 60});
+            chassis.waitUntilDone();
+            i = 3;
+        }
 
         // move the robot
         chassis.arcade(leftY, rightX);

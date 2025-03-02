@@ -298,9 +298,9 @@
       }
     },
     "upload_options": {
-      "slot": 2,
-      "icon": "clawbot",
-      "description": "Match Code"
+      "slot": 1,
+      "icon": "ufo",
+      "description": "Skills Code"
     },
     "use_early_access": true
   }

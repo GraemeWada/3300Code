@@ -7,15 +7,15 @@ alliance color = alliance::RED;
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-pros::MotorGroup left({-16, -12, 13}, pros::MotorGearset::blue);
+pros::MotorGroup left({-2, -12, 13}, pros::MotorGearset::blue);
 pros::MotorGroup right({6, -7, 9}, pros::MotorGearset::blue);
 
 pros::Motor intake(-10);
-pros::Motor ws(17);
+pros::Motor ws(16);
 
 pros::Optical optical(1);//update port when run
 
-pros::Rotation wsr(18);
+pros::Rotation wsr(21);
 
 pros::ADIDigitalOut clampPistons('G');
 pros::ADIDigitalOut descore('B');
@@ -25,9 +25,9 @@ pros::Rotation h(15);
 pros::Rotation v(5);
 pros::Imu imu(14);
 
-pros::Distance rightSensor(21);
-pros::Distance leftSensor(2);
-pros::Distance upSensor(16);
+// pros::Distance rightSensor(21);
+// pros::Distance leftSensor(2);
+// pros::Distance upSensor(16);
 
 lemlib::TrackingWheel htw(&h, lemlib::Omniwheel::NEW_275, -4.61);
 lemlib::TrackingWheel vtw(&v, 2.000f, -0.433);
@@ -39,9 +39,9 @@ lemlib::ControllerSettings lateral_controller(5, // proportional gain (kP)
                                               0, // integral gain (kI)
                                               20, // derivative gain (kD)
                                               3, // anti windup
-                                              1, // small error range, in inches
+                                              .2, // small error range, in inches
                                               100, // small error range timeout, in milliseconds
-                                              3, // large error range, in inches
+                                              2, // large error range, in inches
                                               500, // large error range timeout, in milliseconds
                                               20 // maximum acceleration (slew)
 );
@@ -67,14 +67,14 @@ lemlib::OdomSensors sensors(&vtw, // vertical tracking wheel 1, set to null
 
 // input curve for throttle input during driver control
 lemlib::ExpoDriveCurve throttle_curve(10, // joystick deadband out of 127
-                                     15, // minimum output where drivetrain will move out of 127
-                                     1.03 // expo curve gain
+                                     25, // minimum output where drivetrain will move out of 127
+                                     1.019 // expo curve gain
 );
 
 // input curve for steer input during driver control
 lemlib::ExpoDriveCurve steer_curve(10, // joystick deadband out of 127
-                                  15, // minimum output where drivetrain will move out of 127
-                                  1.03 // expo curve gain
+                                  25, // minimum output where drivetrain will move out of 127
+                                  1.019 // expo curve gain
 );
 
 lemlib::Chassis chassis(drivetrain, // drivetrain settings
